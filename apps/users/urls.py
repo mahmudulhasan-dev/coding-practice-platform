@@ -3,6 +3,6 @@ from .views import RegisterView
 
 app_name = 'users'
 
-urlspatterns = [
+urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
 ]
