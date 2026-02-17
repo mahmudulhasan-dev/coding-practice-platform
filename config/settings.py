@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'rest_framework',
     # custom
     'apps.core',
+    'apps.problems',
     'apps.users',
 ]
 
