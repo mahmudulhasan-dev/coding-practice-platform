@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # thir party
     'rest_framework',
+    'django_ace',
     # custom
     'apps.core',
     'apps.problems',
