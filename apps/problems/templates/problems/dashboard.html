@@ -1,0 +1,23 @@
+<div class="container">
+    <h1>My Practice Vault</h1>
+    <div class="row">
+        {% for category in categories %}
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-dark text-white">
+                        {{ category.name }}
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        {% for problem in category.problems.all %}
+                            <li class="list-group-item">
+                                <a href="{% url 'problem_detail' problem.slug %}">{{ problem.title }}</a>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No problems yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

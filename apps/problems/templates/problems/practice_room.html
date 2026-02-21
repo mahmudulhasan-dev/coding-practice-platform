@@ -1,0 +1,32 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-5 border-end">
+            <h2>{{ problem.title }}</h2>
+            <span class="badge bg-info text-dark">{{ problem.category.name }}</span>
+            <hr>
+            <div class="problem-body">
+                {{ problem.description|linebreaks }}
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <form method="POST">
+                {% csrf_token %}
+                <h4>Your Logic:</h4>
+                <textarea name="user_answer" class="form-control mb-3" rows="12" placeholder="Write your solution here...">{{ user_input }}</textarea>
+                <button type="submit" class="btn btn-success w-100">Submit and Reveal Answer</button>
+            </form>
+
+            {% if show_solution %}
+                <div class="mt-4 p-3 bg-light border-start border-primary border-5">
+                    <h4 class="text-primary">Correct Solution:</h4>
+                    <pre><code class="language-{{ problem.category.name|lower }}">{{ problem.solution }}</code></pre>
+                </div>
+                {% endif %}
+        </div>
+    </div>
+</div>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+{# Include language specific components as needed #}
