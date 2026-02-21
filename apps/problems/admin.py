@@ -15,6 +15,7 @@ class ProblemAdminForm(forms.ModelForm):
                 height='400px',
                 showprintmargin=False,
                 tabsize=4,
+                attrs={'class': 'ace-editor-area'}
             ),
         }
 
@@ -30,3 +31,6 @@ class ProblemAdmin(admin.ModelAdmin):
     list_filter = ('category',)
     search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}
+
+    class Media:
+        js = ('js/admin_mode_switcher.js',)
