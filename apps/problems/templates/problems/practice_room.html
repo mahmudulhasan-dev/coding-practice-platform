@@ -10,15 +10,16 @@
         </div>
 
         <div class="col-md-7">
-            <form method="POST">
+            <form method="POST" id="practice-form">
                 {% csrf_token %}
                 <h4>Your Logic:</h4>
-                <textarea name="user_answer" class="form-control mb-3" rows="12" placeholder="Write your solution here...">{{ user_input }}</textarea>
-                <button type="submit" class="btn btn-success w-100">Submit and Reveal Answer</button>
+                <textarea name="user_answer" id="user_answer_hidden" style="display:none;"></textarea>
+                <div id="editor" style="height: 400px; width: 100%; border-radius: 5px; border: 1px solid #444;">{{ user_input }}</div>
+                <button type="submit" class="btn btn-success w-100 mt-3" onclick="syncCode()">Submit and Reveal Answer</button>
             </form>
 
             {% if show_solution %}
-                <div class="mt-4 p-3 bg-light border-start border-primary border-5">
+                <div class="mt-4 p-3 bg-dark text-light border-start border-success border-5">
                     <h4 class="text-primary">Correct Solution:</h4>
                     <pre><code class="language-{{ problem.category.name|lower }}">{{ problem.solution }}</code></pre>
                 </div>
@@ -29,4 +30,23 @@
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-{# Include language specific components as needed #}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai"); 
+    
+    var mode = "{{ problem.category.name|lower }}";
+    if (mode === "c++") mode = "c_cpp";
+    editor.getSession().setMode("ace/mode/" + mode);
+    
+    editor.setOptions({
+        fontSize: "14pt",
+        showPrintMargin: false,
+        enableBasicAutocompletion: true,
+    });
+
+    function syncCode() {
+        var code = editor.getValue();
+        document.getElementById('user_answer_hidden').value = code;
+    }
+</script>
