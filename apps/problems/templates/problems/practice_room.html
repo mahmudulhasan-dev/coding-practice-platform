@@ -18,6 +18,11 @@
                 <button type="submit" class="btn btn-success w-100 mt-3" onclick="syncCode()">Submit and Reveal Answer</button>
             </form>
 
+            {% if feedback %}
+                <div class="alert {% if is_correct %}alert-success{% else %}alert-danger{% endif %}">
+                    {{ feedback }}
+                </div>
+            {% endif %}
             {% if show_solution %}
                 <div class="mt-4 p-3 bg-dark text-light border-start border-success border-5">
                     <h4 class="text-primary">Correct Solution:</h4>
