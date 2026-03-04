@@ -1,0 +1,12 @@
+/* Styling for the difflib HTML table */
+.diff-container table.diff {
+    font-family: Courier, monospace;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+.diff_header { background-color: #e0e0e0; }
+td.diff_header { text-align: right; width: 40px; }
+.diff_next { background-color: #c0c0c0; display: none; } /* Hide the 'next' links */
+.diff_add { background-color: #dfd; }    /* Green for additions */
+.diff_chg { background-color: #ffffbb; } /* Yellow for changes */
+.diff_sub { background-color: #fdd; }    /* Red for deletions */
