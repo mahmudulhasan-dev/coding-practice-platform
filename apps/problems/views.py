@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404 
 from .models import Problem, Category 
 import re 
+import difflib 
 
 def normalize_code(code_string):
     if not code_string:
@@ -20,14 +21,23 @@ def problem_detail(request, slug):
     user_input = ""
     feedback = ""
     is_correct = False
+    diff_results = None 
 
     if request.method == "POST":
-        user_input = request.POST.get('user_answer')
+        user_input = request.POST.get('user_answer', '')
         if normalize_code(user_input) == normalize_code(problem.solution):
             feedback = "Correct!"
             is_correct = True
         else:
             feedback = "Incorrect solution."
+
+            diff = difflib.HtmlDiff().make_table(
+                fromlines=problem.solution.splitlines(),
+                tolines=user_input.splitlines(),
+                fromdesc="Correct Solution",
+                todesc="Your logic"
+            )
+            diff_results = diff 
         
         show_solution = True 
 
@@ -36,5 +46,6 @@ def problem_detail(request, slug):
         'show_solution': show_solution,
         'user_input': user_input,
         'feedback': feedback,
-        'is_correct': is_correct
+        'is_correct': is_correct,
+        'diff_results': diff_results,
     })

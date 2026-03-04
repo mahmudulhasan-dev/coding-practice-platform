@@ -23,6 +23,12 @@
                     {{ feedback }}
                 </div>
             {% endif %}
+            {% if diff_results %}
+                <div>
+                    <h3>Comparison View:</h3>
+                    {{ diff_results|safe }}
+                </div>
+            {% endif %}
             {% if show_solution %}
                 <div class="mt-4 p-3 bg-dark text-light border-start border-success border-5">
                     <h4 class="text-primary">Correct Solution:</h4>
