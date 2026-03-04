@@ -1,5 +1,14 @@
 from django.shortcuts import render, get_object_or_404 
 from .models import Problem, Category 
+import re 
+
+def normalize_code(code_string):
+    if not code_string:
+        return ""
+    code = code_string
+    code = code.replace('\r\n', '\n').replace('\r', '\n')
+    code = re.sub(r'\s+', '', code)
+    return code 
 
 def problem_list(request):
     categories = Category.objects.prefetch_related('problems').all()
@@ -14,7 +23,7 @@ def problem_detail(request, slug):
 
     if request.method == "POST":
         user_input = request.POST.get('user_answer')
-        if user_input.strip() == problem.solution.strip():
+        if normalize_code(user_input) == normalize_code(problem.solution):
             feedback = "Correct!"
             is_correct = True
         else:
