@@ -1,6 +1,7 @@
 from django.db import models, transaction
 from django.utils.text import slugify 
 from apps.core.models import BaseModel 
+from django.conf import settings 
 
 class Category(BaseModel):
     name = models.CharField(max_length=100, unique=True)
@@ -45,3 +46,15 @@ class Problem(BaseModel):
 
     def __str__(self):
         return self.title 
+
+class ProblemAttemmpt(BaseModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    problem = models.ForeignKey('Problem', on_delete=models.CASCADE)
+    solve_count = models.PositiveIntegerField(default=0)
+    last_solved = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'problem')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.problem.title} - {self.solve_count}"
