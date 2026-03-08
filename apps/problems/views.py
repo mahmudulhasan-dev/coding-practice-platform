@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404 
-from .models import Problem, Category 
+from .models import Problem, Category, ProblemAttempt 
 import re 
 import difflib 
+from django.db.models import F 
 
 def normalize_code(code_string):
     if not code_string:
@@ -28,9 +29,16 @@ def problem_detail(request, slug):
         if normalize_code(user_input) == normalize_code(problem.solution):
             feedback = "Correct!"
             is_correct = True
+
+            if request.user.is_authenticated:
+                attempt, created = ProblemAttempt.objects.get_or_create(
+                    user=request.user,
+                    problem=problem
+                )
+                attempt.solve_count = F('solve_count') + 1
+                attempt.save()
         else:
             feedback = "Incorrect solution."
-
             diff = difflib.HtmlDiff().make_table(
                 fromlines=problem.solution.splitlines(),
                 tolines=user_input.splitlines(),
