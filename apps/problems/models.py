@@ -47,7 +47,7 @@ class Problem(BaseModel):
     def __str__(self):
         return self.title 
 
-class ProblemAttemmpt(BaseModel):
+class ProblemAttempt(BaseModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     problem = models.ForeignKey('Problem', on_delete=models.CASCADE)
     solve_count = models.PositiveIntegerField(default=0)
