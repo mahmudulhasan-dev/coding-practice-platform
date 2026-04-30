@@ -29,10 +29,11 @@
             </form>
 
             {% if feedback %}
-                <div class="alert {% if is_correct %}alert-success{% else %}alert-danger{% endif %}">
+                <div class="mt-2 alert {% if is_correct %}alert-success{% else %}alert-danger{% endif %}">
                     {{ feedback }}
                 </div>
             {% endif %}
+
             {% if diff_results %}
                 <div>
                     <h3>Comparison View:</h3>
