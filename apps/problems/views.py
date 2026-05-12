@@ -1,16 +1,8 @@
 from django.shortcuts import render, get_object_or_404 
 from .models import Problem, Category, ProblemAttempt 
-import re 
 import difflib 
 from django.db.models import F 
-
-def normalize_code(code_string):
-    if not code_string:
-        return ""
-    code = code_string
-    code = code.replace('\r\n', '\n').replace('\r', '\n')
-    code = re.sub(r'\s+', '', code)
-    return code 
+from .utils.code_normalizer import normalize_code
 
 def problem_list(request):
     categories = Category.objects.prefetch_related('problems').all()
