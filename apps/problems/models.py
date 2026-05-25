@@ -2,6 +2,7 @@ from django.db import models, transaction
 from django.utils.text import slugify 
 from apps.core.models import BaseModel 
 from django.conf import settings 
+from ckeditor.fields import RichTextField 
 
 class Category(BaseModel):
     name = models.CharField(max_length=100, unique=True)
@@ -27,7 +28,7 @@ class Problem(BaseModel):
     )
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
-    description = models.TextField()
+    description = RichTextField()
     solution = models.TextField()
     order = models.PositiveIntegerField(default=0)
 
