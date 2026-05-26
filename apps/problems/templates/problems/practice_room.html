@@ -15,7 +15,7 @@
             <span class="badge bg-info text-dark">{{ problem.category.name }}</span>
             <hr>
             <div class="problem-body">
-                {{ problem.description|linebreaks }}
+                {{ problem.description|safe }}
             </div>
         </div>
 
