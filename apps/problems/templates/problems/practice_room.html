@@ -10,7 +10,7 @@
 <body>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-5 border-end">
+        <div class="col-md-4 border-end">
             <h2>{{ problem.title }}</h2>
             <span class="badge bg-info text-dark">{{ problem.category.name }}</span>
             <hr>
@@ -19,7 +19,7 @@
             </div>
         </div>
 
-        <div class="col-md-7">
+        <div class="col-md-8">
             <form method="POST" id="practice-form">
                 {% csrf_token %}
                 <h4>Your Logic:</h4>

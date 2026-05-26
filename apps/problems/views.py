@@ -10,7 +10,6 @@ def problem_list(request):
 
 def problem_detail(request, slug):
     problem = get_object_or_404(Problem, slug=slug)
-    show_solution = False 
     user_input = ""
     feedback = ""
     is_correct = False
@@ -31,19 +30,16 @@ def problem_detail(request, slug):
                 attempt.save()
         else:
             feedback = "Incorrect solution."
-            diff = difflib.HtmlDiff().make_table(
-                fromlines=problem.solution.splitlines(),
-                tolines=user_input.splitlines(),
-                fromdesc="Correct Solution",
-                todesc="Your logic"
-            )
-            diff_results = diff 
         
-        show_solution = True 
+        diff_results = difflib.HtmlDiff().make_table(
+            fromlines=problem.solution.splitlines(),
+            tolines=user_input.splitlines(),
+            fromdesc="Correct Solution",
+            todesc="Your logic"
+        )
 
     return render(request, 'problems/practice_room.html', {
         'problem': problem,
-        'show_solution': show_solution,
         'user_input': user_input,
         'feedback': feedback,
         'is_correct': is_correct,
