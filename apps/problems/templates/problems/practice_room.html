@@ -13,13 +13,12 @@
         </div>
 
         <div class="col-md-8">
-            <form method="POST" id="practice-form">
-                {% csrf_token %}
-                <h4>Your Logic:</h4>
-                <textarea name="user_answer" id="user_answer_hidden" style="display:none;"></textarea>
-                <div id="editor" style="height: 400px; width: 100%; border-radius: 5px; border: 1px solid #444;">{{ user_input }}</div>
-                <button type="submit" class="btn btn-success w-100 mt-3" onclick="syncCode()">Submit and Reveal Answer</button>
-            </form>
+            {% if show_solution %}
+                <div class="mt-4 p-3 bg-dark text-light border-start border-success border-5">
+                    <h4 class="text-primary">Correct Solution:</h4>
+                    <pre><code class="language-{{ problem.category.name|lower }}">{{ problem.solution }}</code></pre>
+                </div>
+            {% endif %}
 
             {% if feedback %}
                 <div class="mt-2 alert {% if is_correct %}alert-success{% else %}alert-danger{% endif %}">
@@ -33,12 +32,14 @@
                     {{ diff_results|safe }}
                 </div>
             {% endif %}
-            {% if show_solution %}
-                <div class="mt-4 p-3 bg-dark text-light border-start border-success border-5">
-                    <h4 class="text-primary">Correct Solution:</h4>
-                    <pre><code class="language-{{ problem.category.name|lower }}">{{ problem.solution }}</code></pre>
-                </div>
-                {% endif %}
+
+            <form method="POST" id="practice-form">
+                {% csrf_token %}
+                <h4>Your Logic:</h4>
+                <textarea name="user_answer" id="user_answer_hidden" style="display:none;"></textarea>
+                <div id="editor" style="height: 400px; width: 100%; border-radius: 5px; border: 1px solid #444;">{{ user_input }}</div>
+                <button type="submit" class="btn btn-success w-100 mt-3" onclick="syncCode()">Submit and Reveal Answer</button>
+            </form>
         </div>
     </div>
 </div>
