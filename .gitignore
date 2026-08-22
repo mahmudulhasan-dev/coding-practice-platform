@@ -14,6 +14,7 @@ ENV/
 *.log
 db.sqlite3
 db.sqlite3-journal
+cpp_db.sql
 
 # Media & static output
 media/

@@ -1,0 +1,17 @@
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: codeplatform_mariadb_dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: devroot123
+      MYSQL_DATABASE: codeplatform_dev
+      MYSQL_USER: codeplatform_dev
+      MYSQL_PASSWORD: codeplatform_dev_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+volumes:
+  mariadb_data:
