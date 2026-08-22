@@ -1,15 +1,31 @@
 from django.contrib import admin
-from .models import Problem, Category 
-from django_ace import AceWidget 
-from django import forms 
+from django import forms
+from django_ace import AceWidget
+from .models import Problem, Category
+
+
+class CategoryModeSelect(forms.Select):
+    """Select widget that stamps each <option> with the category's Ace mode
+    so admin_mode_switcher.js can read it via data-ace-mode, instead of
+    re-deriving the mode from the category's display name in JS."""
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        if value:
+            pk = value.value if hasattr(value, 'value') else value
+            ace_mode = Category.objects.filter(pk=pk).values_list('ace_mode', flat=True).first()
+            if ace_mode:
+                option['attrs']['data-ace-mode'] = ace_mode
+        return option
+
 
 class ProblemAdminForm(forms.ModelForm):
     class Meta:
-        model = Problem 
+        model = Problem
         fields = '__all__'
         widgets = {
+            'category': CategoryModeSelect(),
             'solution': AceWidget(
-                mode='c_cpp',
+                mode='text',  # real mode is set client-side by admin_mode_switcher.js
                 theme='monokai',
                 width='100%',
                 height='400px',
@@ -19,14 +35,16 @@ class ProblemAdminForm(forms.ModelForm):
             ),
         }
 
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug')
+    list_display = ('name', 'slug', 'ace_mode')
     prepopulated_fields = {'slug': ('name',)}
+
 
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
-    form = ProblemAdminForm 
+    form = ProblemAdminForm
     list_display = ('title', 'category', 'created_at')
     list_filter = ('category',)
     search_fields = ('title', 'description')

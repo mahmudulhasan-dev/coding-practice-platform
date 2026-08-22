@@ -1,16 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const categorySelect = document.querySelector('#id_category');
-    const modeMapping = {
-        'Python': 'python',
-        'MySQL': 'mysql',
-        'C++': 'c_cpp',
-        'C': 'c_cpp',
-        'JavaScript': 'javascript'
-    };
 
     function updateEditorMode() {
-        const selectedCategory = categorySelect.options[categorySelect.selectedIndex].text;
-        const mode =  modeMapping[selectedCategory] || 'text';
+        const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+        const mode = selectedOption.dataset.aceMode || 'text';
 
         const editorElement = document.querySelector('.ace_editor');
 

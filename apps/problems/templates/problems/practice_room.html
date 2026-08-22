@@ -16,7 +16,7 @@
             {% if show_solution %}
                 <div class="mt-4 p-3 bg-dark text-light border-start border-success border-5">
                     <h4 class="text-primary">Correct Solution:</h4>
-                    <pre><code class="language-{{ problem.category.name|lower }}">{{ problem.solution }}</code></pre>
+                    <pre><code class="language-{{ problem.category.ace_mode }}">{{ problem.solution }}</code></pre>
                 </div>
             {% endif %}
 
@@ -51,12 +51,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
 <script>
     var editor = ace.edit("editor");
-    editor.setTheme("ace/theme/monokai"); 
-    
-    var mode = "{{ problem.category.name|lower }}";
-    if (mode === "c++") mode = "c_cpp";
+    editor.setTheme("ace/theme/monokai");
+
+    var mode = "{{ problem.category.ace_mode|default:'text' }}";
     editor.getSession().setMode("ace/mode/" + mode);
-    
+
     editor.setOptions({
         fontSize: "14pt",
         showPrintMargin: false,
@@ -69,4 +68,3 @@
     }
 </script>
 {% endblock %}
-
