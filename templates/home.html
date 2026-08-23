@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Coding Practice Platform{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="text-center">
+      <h1>Coding Practice Platform</h1>
+      <p class="lead">Learn concepts through lessons, then prove you can recall them.</p>
+      <div class="mt-4">
+        <a href="{% url 'lessons:lesson_list' %}" class="btn btn-primary me-2">Browse Lessons</a>
+        <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary">Practice Problems</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
