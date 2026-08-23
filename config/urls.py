@@ -7,4 +7,5 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/problems/', permanent=True)),
     path('api/users/', include('apps.users.urls')),
     path('problems/', include('apps.problems.urls')),
+    path('lessons/', include('apps.lessons.urls')),
 ]
