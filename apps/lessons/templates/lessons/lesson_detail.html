@@ -11,8 +11,10 @@
 {% endblock %}
 
 {% block content %}
-  <article>
-    <h1>{{ lesson.title }}</h1>
-    {{ lesson.content|linebreaks }}
-  </article>
+  <div class="container mt-4">
+    <article>
+      <h1>{{ lesson.title }}</h1>
+      {{ lesson.content|linebreaks }}
+    </article>
+  </div>
 {% endblock %}
