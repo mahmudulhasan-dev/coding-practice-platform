@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django_ace',
     # custom
     'apps.core',
+    'apps.lessons',
     'apps.problems',
     'apps.users',
 ]
