@@ -9,7 +9,7 @@ class Lesson(BaseModel):
     is_approved = models.BooleanField(default=False)
 
     def get_absolute_url(self):
-        return reverse('lesson_detail', kwargs={'slug': self.slug})
+        return reverse('lessons:lesson_detail', kwargs={'slug': self.slug})
 
     def __str__(self):
         return self.title
