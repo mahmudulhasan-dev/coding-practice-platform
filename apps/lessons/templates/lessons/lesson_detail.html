@@ -8,6 +8,9 @@
   {% else %}
     <meta name="robots" content="noindex, nofollow">
   {% endif %}
+
+  {{ block.super }}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -17,4 +20,11 @@
       {{ lesson.content|safe }}
     </article>
   </div>
+{% endblock %}  
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script>Prism.highlightAll();</script>
 {% endblock %}

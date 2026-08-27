@@ -18,9 +18,11 @@ class Lesson(BaseModel):
             "ListItem": True,
             "Blockquote": True,
             "CodeBlock": True,
+            "CodeBlock": {"languageClassPrefix": "language-"},
             "Link": True,
             "HorizontalRule": True,
             "History": True,
+            "HTML": True,
         },
         sanitize=True,
     )
