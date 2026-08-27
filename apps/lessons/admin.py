@@ -8,3 +8,6 @@ class LessonAdmin(admin.ModelAdmin):
     search_fields = ('title', 'content')
     prepopulated_fields = {'slug': ('title',)}
     readonly_fields = ('uid', 'created_at', 'updated_at')
+
+    class Media:
+        css = {"all": ("lessons/admin_prose_editor.css",)}

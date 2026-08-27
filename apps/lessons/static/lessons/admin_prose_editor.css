@@ -1,0 +1,4 @@
+.prose-editor .ProseMirror {
+    max-height: 450px;
+    overflow-y: auto;
+}
