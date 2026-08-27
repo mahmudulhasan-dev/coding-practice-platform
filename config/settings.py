@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'rest_framework',
     'django_ace',
+    "django_prose_editor",
     # custom
     'apps.core',
     'apps.lessons',

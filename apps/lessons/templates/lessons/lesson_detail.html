@@ -14,7 +14,7 @@
   <div class="container mt-4">
     <article>
       <h1>{{ lesson.title }}</h1>
-      {{ lesson.content|linebreaks }}
+      {{ lesson.content|safe }}
     </article>
   </div>
 {% endblock %}
