@@ -1,0 +1,8 @@
+article code:not(pre code) {
+  background: #2d2d2d;
+  color: #e6db74;
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+  font-family: monospace;
+}

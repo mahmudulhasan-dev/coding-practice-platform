@@ -17,7 +17,7 @@ class Lesson(BaseModel):
             "OrderedList": True,
             "ListItem": True,
             "Blockquote": True,
-            "CodeBlock": True,
+            "Code": True,
             "CodeBlock": {"languageClassPrefix": "language-"},
             "Link": True,
             "HorizontalRule": True,
