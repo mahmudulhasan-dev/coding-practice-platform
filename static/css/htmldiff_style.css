@@ -1,12 +1,110 @@
-/* Styling for the difflib HTML table */
-.diff-container table.diff {
-    font-family: Courier, monospace;
-    border: 1px solid #ccc;
-    width: 100%;
+/* Diff comparison view — matches the dark Prism/Ace theme used elsewhere */
+.diff-container {
+    background-color: #272822; /* matches prism-okaidia bg */
+    border-radius: 6px;
+    padding: 16px;
+    border: 1px solid #444;
 }
-.diff_header { background-color: #e0e0e0; }
-td.diff_header { text-align: right; width: 40px; }
-.diff_next { background-color: #c0c0c0; display: none; } /* Hide the 'next' links */
-.diff_add { background-color: #dfd; }    /* Green for additions */
-.diff_chg { background-color: #ffffbb; } /* Yellow for changes */
-.diff_sub { background-color: #fdd; }    /* Red for deletions */
+
+.diff-legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: #ccc;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+.legend-chg { background-color: #7a6a1e; }
+.legend-del { background-color: #7a2e2e; }
+.legend-add { background-color: #2e5c2e; }
+
+.diff-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    table-layout: fixed;
+}
+
+.diff-table th {
+    text-align: left;
+    color: #aaa;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-bottom: 1px solid #444;
+    position: sticky;
+    top: 0;
+    background-color: #272822;
+}
+
+.diff-table th.diff-lineno,
+.diff-table td.diff-lineno {
+    width: 40px;
+    text-align: right;
+    color: #666;
+    user-select: none;
+    padding-right: 8px;
+}
+
+.diff-cell {
+    padding: 0 10px;
+    vertical-align: top;
+    border-left: 1px solid #3a3a35;
+}
+
+.diff-cell pre {
+    margin: 0;
+    padding: 2px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: transparent !important; /* let row background show through */
+}
+
+.diff-cell code {
+    background: transparent !important;
+}
+
+/* Row backgrounds by diff type — kept subtle so Prism token colors stay legible */
+.diff-row.diff-equal .diff-cell {
+    background-color: transparent;
+}
+
+.diff-row.diff-replace .diff-cell {
+    background-color: rgba(255, 235, 59, 0.12);
+}
+
+.diff-row.diff-delete td:nth-child(1),
+.diff-row.diff-delete td:nth-child(2) {
+    background-color: rgba(220, 80, 80, 0.15);
+}
+
+.diff-row.diff-insert td:nth-child(3),
+.diff-row.diff-insert td:nth-child(4) {
+    background-color: rgba(80, 200, 100, 0.15);
+}
+
+/* Empty placeholder side of an insert/delete row */
+.diff-row.diff-delete td:nth-child(3),
+.diff-row.diff-delete td:nth-child(4),
+.diff-row.diff-insert td:nth-child(1),
+.diff-row.diff-insert td:nth-child(2) {
+    background-color: rgba(255, 255, 255, 0.02);
+    min-height: 1.4em;
+}
+
+.diff-row {
+    border-bottom: 1px solid #333;
+}

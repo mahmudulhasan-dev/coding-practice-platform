@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404 
 from .models import Problem, Category, ProblemAttempt 
-import difflib 
 from django.db.models import F 
 from .utils.code_normalizer import normalize_code
+from .utils.diff_builder import build_line_diff
 
 def problem_list(request):
     categories = Category.objects.prefetch_related('problems').all()
@@ -13,7 +13,7 @@ def problem_detail(request, slug):
     user_input = ""
     feedback = ""
     is_correct = False
-    diff_results = None 
+    diff_rows = None
 
     if request.method == "POST":
         user_input = request.POST.get('user_answer', '')
@@ -30,18 +30,13 @@ def problem_detail(request, slug):
                 attempt.save()
         else:
             feedback = "Incorrect solution."
-        
-        diff_results = difflib.HtmlDiff().make_table(
-            fromlines=problem.solution.splitlines(),
-            tolines=user_input.splitlines(),
-            fromdesc="Correct Solution",
-            todesc="Your logic"
-        )
+
+        diff_rows = build_line_diff(problem.solution, user_input)
 
     return render(request, 'problems/practice_room.html', {
         'problem': problem,
         'user_input': user_input,
         'feedback': feedback,
         'is_correct': is_correct,
-        'diff_results': diff_results,
+        'diff_rows': diff_rows,
     })

@@ -26,11 +26,35 @@
                 </div>
             {% endif %}
 
-            {% if diff_results %}
-                <div>
-                    <h3>Comparison View:</h3>
-                    {{ diff_results|safe }}
+            {% if diff_rows %}
+            <div class="diff-container mt-4">
+                <h3>Comparison View:</h3>
+                <div class="diff-legend">
+                    <span class="legend-item"><span class="legend-swatch legend-chg"></span>Changed</span>
+                    <span class="legend-item"><span class="legend-swatch legend-del"></span>Missing from yours</span>
+                    <span class="legend-item"><span class="legend-swatch legend-add"></span>Extra in yours</span>
                 </div>
+                <table class="diff-table">
+                    <thead>
+                        <tr>
+                            <th class="diff-lineno"></th>
+                            <th>Correct Solution</th>
+                            <th class="diff-lineno"></th>
+                            <th>Your Logic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in diff_rows %}
+                        <tr class="diff-row diff-{{ row.tag }}">
+                            <td class="diff-lineno">{{ row.left_no|default:"" }}</td>
+                            <td class="diff-cell">{% if row.left is not None %}<pre><code class="language-{{ problem.category.ace_mode }}">{{ row.left }}</code></pre>{% endif %}</td>
+                            <td class="diff-lineno">{{ row.right_no|default:"" }}</td>
+                            <td class="diff-cell">{% if row.right is not None %}<pre><code class="language-{{ problem.category.ace_mode }}">{{ row.right }}</code></pre>{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             {% endif %}
 
             <form method="POST" id="practice-form">
@@ -48,6 +72,8 @@
 {% block extra_js %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script>Prism.highlightAll();</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
 <script>
     var editor = ace.edit("editor");
