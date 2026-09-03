@@ -33,6 +33,8 @@ class ProblemAdminForm(forms.ModelForm):
                 tabsize=4,
                 attrs={'class': 'ace-editor-area'}
             ),
+            # 'description' is intentionally omitted here — ProseEditorField
+            # supplies its own widget via formfield(), same as on Lesson.
         }
 
 
@@ -51,4 +53,7 @@ class ProblemAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
 
     class Media:
+        css = {
+            'all': ('lessons/admin_prose_editor.css',)  # height-cap override for .ProseMirror
+        }
         js = ('js/admin_mode_switcher.js',)

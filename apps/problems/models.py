@@ -1,8 +1,9 @@
 from django.db import models, transaction
-from django.utils.text import slugify 
-from apps.core.models import BaseModel 
-from django.conf import settings 
-from ckeditor.fields import RichTextField 
+from django.utils.text import slugify
+from apps.core.models import BaseModel
+from django.conf import settings
+from django_prose_editor.fields import ProseEditorField
+
 
 class Category(BaseModel):
     name = models.CharField(max_length=100, unique=True)
@@ -18,16 +19,17 @@ class Category(BaseModel):
     )
 
     class Meta:
-        verbose_name_plural = "Categories" 
-    
+        verbose_name_plural = "Categories"
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name 
-    
+        return self.name
+
+
 class Problem(BaseModel):
     category = models.ForeignKey(
         Category,
@@ -37,7 +39,23 @@ class Problem(BaseModel):
     )
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
-    description = RichTextField()
+    description = ProseEditorField(
+        extensions={
+            "Bold": True,
+            "Italic": True,
+            "Strike": True,
+            "BulletList": True,
+            "OrderedList": True,
+            "ListItem": True,
+            "Blockquote": True,
+            "CodeBlock": True,
+            "Heading": {"levels": [2, 3]},
+            "Link": True,
+            "HorizontalRule": True,
+            "History": True,
+        },
+        sanitize=True,
+    )
     solution = models.TextField()
     order = models.PositiveIntegerField(default=0)
 
@@ -55,7 +73,8 @@ class Problem(BaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.title 
+        return self.title
+
 
 class ProblemAttempt(BaseModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
