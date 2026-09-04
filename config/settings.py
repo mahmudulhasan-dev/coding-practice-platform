@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # thir party
-    'ckeditor',
     'rest_framework',
     'django_ace',
     "django_prose_editor",
