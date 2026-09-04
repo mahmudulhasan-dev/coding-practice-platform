@@ -1,12 +1,13 @@
-from django.shortcuts import render, get_object_or_404 
-from .models import Problem, Category, ProblemAttempt 
-from django.db.models import F 
+from django.shortcuts import render, get_object_or_404
+from .models import Problem, Category, ProblemAttempt
 from .utils.code_normalizer import normalize_code
 from .utils.diff_builder import build_line_diff
+
 
 def problem_list(request):
     categories = Category.objects.prefetch_related('problems').all()
     return render(request, 'problems/dashboard.html', {'categories': categories})
+
 
 def problem_detail(request, slug):
     problem = get_object_or_404(Problem, slug=slug)
@@ -17,19 +18,15 @@ def problem_detail(request, slug):
 
     if request.method == "POST":
         user_input = request.POST.get('user_answer', '')
-        if normalize_code(user_input) == normalize_code(problem.solution):
-            feedback = "Correct!"
-            is_correct = True
+        is_correct = normalize_code(user_input) == normalize_code(problem.solution)
+        feedback = "Correct!" if is_correct else "Incorrect solution."
 
-            if request.user.is_authenticated:
-                attempt, created = ProblemAttempt.objects.get_or_create(
-                    user=request.user,
-                    problem=problem
-                )
-                attempt.solve_count = F('solve_count') + 1
-                attempt.save()
-        else:
-            feedback = "Incorrect solution."
+        if request.user.is_authenticated:
+            attempt, _ = ProblemAttempt.objects.get_or_create(
+                user=request.user,
+                problem=problem
+            )
+            attempt.record_attempt(is_correct)
 
         diff_rows = build_line_diff(problem.solution, user_input)
 
