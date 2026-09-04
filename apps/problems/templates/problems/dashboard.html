@@ -6,6 +6,32 @@
         My Practice Vault
     </h1>
 
+    {% if due_attempts %}
+        <div class="mb-5">
+            <h2 class="h5 text-uppercase tracking-wider text-muted mb-3 border-bottom pb-2">
+                Due for Review
+                <span class="badge bg-primary rounded-pill">{{ due_attempts|length }}</span>
+            </h2>
+
+            <div class="list-group list-group-flush">
+                {% for attempt in due_attempts %}
+                    <a href="{% url 'problem_detail' attempt.problem.slug %}"
+                       class="list-group-item list-group-item-action px-0 py-3 border-0 d-flex justify-content-between align-items-center">
+
+                        <span class="fs-5 text-primary">
+                            {{ attempt.problem.title }}
+                        </span>
+
+                        <span class="badge bg-secondary">
+                            streak: {{ attempt.correct_streak }}
+                        </span>
+
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
     {% for category in categories %}
         <div class="mb-5">
             <h2 class="h5 text-uppercase tracking-wider text-muted mb-3 border-bottom pb-2">

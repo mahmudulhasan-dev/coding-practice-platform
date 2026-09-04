@@ -6,7 +6,14 @@ from .utils.diff_builder import build_line_diff
 
 def problem_list(request):
     categories = Category.objects.prefetch_related('problems').all()
-    return render(request, 'problems/dashboard.html', {'categories': categories})
+    due_attempts = []
+    if request.user.is_authenticated:
+        due_attempts = ProblemAttempt.objects.due_for_review(request.user)
+
+    return render(request, 'problems/dashboard.html', {
+        'categories': categories,
+        'due_attempts': due_attempts,
+    })
 
 
 def problem_detail(request, slug):

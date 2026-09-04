@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django import forms
 from django_ace import AceWidget
-from .models import Problem, Category
+from .models import Problem, Category, ProblemAttempt
 
 
 class CategoryModeSelect(forms.Select):
@@ -57,3 +57,15 @@ class ProblemAdmin(admin.ModelAdmin):
             'all': ('lessons/admin_prose_editor.css',)  # height-cap override for .ProseMirror
         }
         js = ('js/admin_mode_switcher.js',)
+
+
+@admin.register(ProblemAttempt)
+class ProblemAttemptAdmin(admin.ModelAdmin):
+    list_display = (
+        'user', 'problem', 'solve_count', 'correct_streak', 'next_review_date', 'last_solved',
+    )
+    list_filter = ('correct_streak', 'next_review_date')
+    search_fields = ('user__username', 'problem__title')
+    autocomplete_fields = ('user', 'problem')
+    date_hierarchy = 'next_review_date'
+    readonly_fields = ('solve_count', 'correct_streak', 'next_review_date', 'last_solved')
