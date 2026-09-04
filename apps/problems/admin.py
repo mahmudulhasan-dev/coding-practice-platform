@@ -65,7 +65,7 @@ class ProblemAttemptAdmin(admin.ModelAdmin):
         'user', 'problem', 'solve_count', 'correct_streak', 'next_review_date', 'last_solved',
     )
     list_filter = ('correct_streak', 'next_review_date')
-    search_fields = ('user__username', 'problem__title')
+    search_fields = ('user__email', 'problem__title')
     autocomplete_fields = ('user', 'problem')
     date_hierarchy = 'next_review_date'
     readonly_fields = ('solve_count', 'correct_streak', 'next_review_date', 'last_solved')
