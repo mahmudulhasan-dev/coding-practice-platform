@@ -24,7 +24,7 @@ def _attach_review_status(categories, user):
         for problem in category.problems.all():
             attempt = attempts_by_problem_id.get(problem.id)
 
-            if attempt is None:
+            if attempt is None or attempt.next_review_date is None:
                 label, css_class = "Not Attempted", "bg-secondary"
             elif attempt.next_review_date and attempt.next_review_date <= today:
                 label, css_class = "Due for Review", "bg-warning text-dark"
@@ -42,7 +42,7 @@ def _attach_review_status(categories, user):
 def problem_list(request):
     categories = Category.objects.prefetch_related('problems').all()
     _attach_review_status(categories, request.user)
-    
+
     due_attempts = []
     if request.user.is_authenticated:
         due_attempts = ProblemAttempt.objects.due_for_review(request.user)
