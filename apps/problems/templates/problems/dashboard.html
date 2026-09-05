@@ -47,6 +47,12 @@
                             {{ problem.title }}
                         </span>
 
+                        {% if request.user.is_authenticated %}
+                            <span class="badge {{ problem.review_status_class }}">
+                                {{ problem.review_status_label }}
+                            </span>
+                        {% endif %}
+
                     </a>
                 {% empty %}
                     <p class="text-muted small">
