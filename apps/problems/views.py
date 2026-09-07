@@ -59,6 +59,7 @@ def problem_detail(request, slug):
     feedback = ""
     is_correct = False
     diff_rows = None
+    next_problem = None
 
     if request.method == "POST":
         user_input = request.POST.get('user_answer', '')
@@ -73,6 +74,12 @@ def problem_detail(request, slug):
             attempt.record_attempt(is_correct)
 
         diff_rows = build_line_diff(problem.solution, user_input)
+        next_problem = (
+            Problem.objects
+            .filter(category=problem.category, order_gt=problem.order)
+            .order_by('order')
+            .first()
+            )
 
     return render(request, 'problems/practice_room.html', {
         'problem': problem,
@@ -80,4 +87,5 @@ def problem_detail(request, slug):
         'feedback': feedback,
         'is_correct': is_correct,
         'diff_rows': diff_rows,
+        'next_problem': next_problem,
     })

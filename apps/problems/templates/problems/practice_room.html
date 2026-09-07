@@ -24,6 +24,17 @@
                 <div class="mt-2 alert {% if is_correct %}alert-success{% else %}alert-danger{% endif %}">
                     {{ feedback }}
                 </div>
+
+                {% if next_problem %}
+                    <a href="{% url 'problem_detail' next_problem.slug %}" class="btn btn-primary w-100 mb-3">
+                        Next Problem: {{ next_problem.title }} &rarr;
+                    </a>
+                {% else %}
+                    <div class="alert alert-info">
+                        You've completed all problems in <strong>{{ problem.category.name }}</strong>.
+                        <a href="{% url 'problem_list' %}" class="alert-link">Back to Practice Vault</a>
+                    </div>
+                {% endif %}
             {% endif %}
 
             {% if diff_rows %}
