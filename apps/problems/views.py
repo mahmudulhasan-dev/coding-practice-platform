@@ -76,7 +76,7 @@ def problem_detail(request, slug):
         diff_rows = build_line_diff(problem.solution, user_input)
         next_problem = (
             Problem.objects
-            .filter(category=problem.category, order_gt=problem.order)
+            .filter(category=problem.category, order__gt=problem.order)
             .order_by('order')
             .first()
             )
