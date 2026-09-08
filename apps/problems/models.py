@@ -55,6 +55,10 @@ class Problem(BaseModel):
             "Link": True,
             "HorizontalRule": True,
             "History": True,
+            "Table": True,
+            "TableRow": True,
+            "TableHeader": True,
+            "TableCell": True,
         },
         sanitize=True,
     )
