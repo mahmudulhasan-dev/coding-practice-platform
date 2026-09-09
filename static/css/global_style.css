@@ -1,3 +1,9 @@
+.problem-sidebar {
+    max-height: 100vh;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+}
+
 .problem-body table {
     width: 100%;
     border-collapse: collapse;
