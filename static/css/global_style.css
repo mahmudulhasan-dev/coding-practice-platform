@@ -10,8 +10,11 @@
 }
 
 .problem-sidebar {
-    max-height: calc(100vh - var(--navbar-height));
+    position: sticky;
+    top: var(--navbar-height);
+    height: calc(100vh - var(--navbar-height));
     overflow-y: auto;
+    align-self: start;
     padding-bottom: 1rem;
 }
 
