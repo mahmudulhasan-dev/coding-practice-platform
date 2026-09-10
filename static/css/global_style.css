@@ -1,5 +1,13 @@
+:root {
+    --navbar-height: 64px;
+}
+
+.site-navbar {
+    height: var(--navbar-height);
+}
+
 .problem-sidebar {
-    max-height: 100vh;
+    max-height: calc(100vh - var(--navbar-height));
     overflow-y: auto;
     padding-bottom: 1rem;
 }
