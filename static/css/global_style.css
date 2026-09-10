@@ -9,12 +9,20 @@
     z-index: 1000;
 }
 
-.problem-sidebar {
-    position: sticky;
-    top: var(--navbar-height);
+.practice-room-container {
     height: calc(100vh - var(--navbar-height));
+    overflow: hidden;
+}
+
+.problem-sidebar {
+    height: 100%;
     overflow-y: auto;
-    align-self: start;
+    padding-bottom: 1rem;
+}
+
+.practice-workspace {
+    height: 100%;
+    overflow-y: auto;
     padding-bottom: 1rem;
 }
 
