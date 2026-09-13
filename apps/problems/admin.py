@@ -4,15 +4,15 @@ from django_ace import AceWidget
 from .models import Problem, Category, ProblemAttempt, Language
 
 
-class CategoryModeSelect(forms.Select):
-    """Select widget that stamps each <option> with the category's Ace mode
+class LanguageModeSelect(forms.Select):
+    """Select widget that stamps each <option> with the language's Ace mode
     so admin_mode_switcher.js can read it via data-ace-mode, instead of
-    re-deriving the mode from the category's display name in JS."""
+    re-deriving the mode from the language's display name in JS."""
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex, attrs)
         if value:
             pk = value.value if hasattr(value, 'value') else value
-            ace_mode = Category.objects.filter(pk=pk).values_list('ace_mode', flat=True).first()
+            ace_mode = Language.objects.filter(pk=pk).values_list('ace_mode', flat=True).first()
             if ace_mode:
                 option['attrs']['data-ace-mode'] = ace_mode
         return option
@@ -23,7 +23,7 @@ class ProblemAdminForm(forms.ModelForm):
         model = Problem
         fields = '__all__'
         widgets = {
-            'category': CategoryModeSelect(),
+            'language': LanguageModeSelect(),
             'solution': AceWidget(
                 mode='text',  # real mode is set client-side by admin_mode_switcher.js
                 theme='monokai',
@@ -40,7 +40,7 @@ class ProblemAdminForm(forms.ModelForm):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'ace_mode')
+    list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
 
 
@@ -53,8 +53,8 @@ class LanguageAdmin(admin.ModelAdmin):
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
     form = ProblemAdminForm
-    list_display = ('title', 'category', 'created_at')
-    list_filter = ('category',)
+    list_display = ('title', 'language', 'category', 'created_at')
+    list_filter = ('language', 'category')
     search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}
 

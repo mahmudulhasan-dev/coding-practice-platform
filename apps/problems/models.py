@@ -11,15 +11,6 @@ from .utils.spaced_repetition import get_next_interval_days
 class Category(BaseModel):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True, blank=True)
-    ace_mode = models.CharField(
-        max_length=50,
-        choices=[
-            ('python', 'Python'), ('c_cpp', 'C / C++'), ('javascript', 'JavaScript'),
-            ('java', 'Java'), ('csharp', 'C#'), ('mysql', 'MySQL'),
-            ('golang', 'Go'), ('ruby', 'Ruby'), ('text', 'Plain Text'),
-        ],
-        default='text',
-    )
 
     class Meta:
         verbose_name_plural = "Categories"
@@ -60,8 +51,6 @@ class Problem(BaseModel):
         Language,
         on_delete=models.PROTECT,
         related_name='problems',
-        null=True,
-        blank=True,
     )
     category = models.ForeignKey(
         Category,

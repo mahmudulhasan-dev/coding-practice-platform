@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const categorySelect = document.querySelector('#id_category');
+    const languageSelect = document.querySelector('#id_language');
 
     function updateEditorMode() {
-        const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+        const selectedOption = languageSelect.options[languageSelect.selectedIndex];
         const mode = selectedOption.dataset.aceMode || 'text';
 
         const editorElement = document.querySelector('.ace_editor');
@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if (categorySelect) {
-        categorySelect.addEventListener('change', updateEditorMode);
+    if (languageSelect) {
+        languageSelect.addEventListener('change', updateEditorMode);
         setTimeout(updateEditorMode, 500);
     }
 });

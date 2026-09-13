@@ -5,7 +5,7 @@
     <div class="row practice-room-container">
         <div class="col-md-4 border-end problem-sidebar">
             <h2>{{ problem.title }}</h2>
-            <span class="badge bg-info text-dark">{{ problem.category.name }}</span>
+            <span class="badge bg-info text-dark">{{ problem.language.name }}</span>
             <hr>
             <div class="problem-body">
                 {{ problem.description|safe }}
@@ -16,7 +16,7 @@
             {% if show_solution %}
                 <div class="mt-4 p-3 bg-dark text-light border-start border-success border-5">
                     <h4 class="text-primary">Correct Solution:</h4>
-                    <pre><code class="language-{{ problem.category.ace_mode }}">{{ problem.solution }}</code></pre>
+                    <pre><code class="language-{{ problem.language.ace_mode }}">{{ problem.solution }}</code></pre>
                 </div>
             {% endif %}
 
@@ -31,7 +31,7 @@
                     </a>
                 {% else %}
                     <div class="alert alert-info">
-                        You've completed all problems in <strong>{{ problem.category.name }}</strong>.
+                        You've completed all problems in <strong>{{ problem.language.name }}</strong>.
                         <a href="{% url 'problem_list' %}" class="alert-link">Back to Practice Vault</a>
                     </div>
                 {% endif %}
@@ -58,9 +58,9 @@
                         {% for row in diff_rows %}
                         <tr class="diff-row diff-{{ row.tag }}">
                             <td class="diff-lineno">{{ row.left_no|default:"" }}</td>
-                            <td class="diff-cell">{% if row.left is not None %}<pre><code class="language-{{ problem.category.ace_mode }}">{{ row.left }}</code></pre>{% endif %}</td>
+                            <td class="diff-cell">{% if row.left is not None %}<pre><code class="language-{{ problem.language.ace_mode }}">{{ row.left }}</code></pre>{% endif %}</td>
                             <td class="diff-lineno">{{ row.right_no|default:"" }}</td>
-                            <td class="diff-cell">{% if row.right is not None %}<pre><code class="language-{{ problem.category.ace_mode }}">{{ row.right }}</code></pre>{% endif %}</td>
+                            <td class="diff-cell">{% if row.right is not None %}<pre><code class="language-{{ problem.language.ace_mode }}">{{ row.right }}</code></pre>{% endif %}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -90,7 +90,7 @@
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/monokai");
 
-    var mode = "{{ problem.category.ace_mode|default:'text' }}";
+    var mode = "{{ problem.language.ace_mode|default:'text' }}";
     editor.getSession().setMode("ace/mode/" + mode);
 
     editor.setOptions({
