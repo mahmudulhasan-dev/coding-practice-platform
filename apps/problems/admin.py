@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django import forms
 from django_ace import AceWidget
-from .models import Problem, Category, ProblemAttempt
+from .models import Problem, Category, ProblemAttempt, Language
 
 
 class CategoryModeSelect(forms.Select):
@@ -41,6 +41,12 @@ class ProblemAdminForm(forms.ModelForm):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'ace_mode')
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(Language)
+class LanguageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'ace_mode', 'slug')
     prepopulated_fields = {'slug': ('name',)}
 
 

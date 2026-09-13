@@ -1,16 +1,16 @@
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
-from .models import Problem, Category, ProblemAttempt
+from .models import Problem, Category, ProblemAttempt, Language
 from .utils.code_normalizer import normalize_code
 from .utils.diff_builder import build_line_diff
 
 
-def _attach_review_status(categories, user):
+def _attach_review_status(languages, user):
     """"
     Annotate each prefetched Problem with review_status_label/_class
     based on the user's ProblemAttempt, if any. Mutates the already loaded
     Problem instances in place so the template can keep using
-    category.problems.all() unchanged.
+    language.problems.all() unchanged.
     """
     today = timezone.now().date()
     attempts_by_problem_id = {}
@@ -20,8 +20,8 @@ def _attach_review_status(categories, user):
             for a in ProblemAttempt.objects.filter(user=user)
         }
 
-    for category in categories:
-        for problem in category.problems.all():
+    for language in languages:
+        for problem in language.problems.all():
             attempt = attempts_by_problem_id.get(problem.id)
 
             if attempt is None or attempt.next_review_date is None:
@@ -40,15 +40,15 @@ def _attach_review_status(categories, user):
 
 
 def problem_list(request):
-    categories = Category.objects.prefetch_related('problems').all()
-    _attach_review_status(categories, request.user)
+    languages = Language.objects.prefetch_related('problems').all()
+    _attach_review_status(languages, request.user)
 
     due_attempts = []
     if request.user.is_authenticated:
         due_attempts = ProblemAttempt.objects.due_for_review(request.user)
 
     return render(request, 'problems/dashboard.html', {
-        'categories': categories,
+        'languages': languages,
         'due_attempts': due_attempts,
     })
 
