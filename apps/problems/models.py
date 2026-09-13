@@ -33,7 +33,36 @@ class Category(BaseModel):
         return self.name
 
 
+class Language(BaseModel):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True, blank=True)
+    ace_mode = models.CharField(
+        max_length=50,
+        choices=[
+            ('python', 'Python'), ('c_cpp', 'C / C++'), ('javascript', 'JavaScript'),
+            ('java', 'Java'), ('csharp', 'C#'), ('mysql', 'MySQL'),
+            ('golang', 'Go'), ('ruby', 'Ruby'), ('text', 'Plain Text'),
+        ],
+        default='text',
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
 class Problem(BaseModel):
+    language = models.ForeignKey(
+        Language,
+        on_delete=models.PROTECT,
+        related_name='problems',
+        null=True,
+        blank=True,
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
