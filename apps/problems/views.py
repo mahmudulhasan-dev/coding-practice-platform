@@ -1,3 +1,4 @@
+from django.db.models import Prefetch
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from .models import Problem, Category, ProblemAttempt, Language
@@ -40,8 +41,19 @@ def _attach_review_status(languages, user):
 
 
 def problem_list(request):
-    languages = Language.objects.prefetch_related('problems').all()
+    languages = Language.objects.prefetch_related(
+        Prefetch('problems', queryset=Problem.objects.select_related('category').order_by('category', 'order'))
+        ).all()
     _attach_review_status(languages, request.user)
+
+    for language in languages:
+        categories = {}
+        for problem in language.problems.all():
+            categories.setdefault(problem.category, []).append(problem)
+        language.grouped_categories = [
+            {'category': category, 'problems': problems}
+            for category, problems in categories.items()
+        ]
 
     due_attempts = []
     if request.user.is_authenticated:

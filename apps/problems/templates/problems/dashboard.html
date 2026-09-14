@@ -34,33 +34,37 @@
 
     {% for language in languages %}
         <div class="mb-5">
-            <h2 class="h5 text-uppercase tracking-wider text-muted mb-3 border-bottom pb-2">
-                {{ language.name }}
-            </h2>
+            <h2 class="h4 mb-3">{{ language.name }}</h2>
 
-            <div class="list-group list-group-flush">
-                {% for problem in language.problems.all %}
-                    <a href="{% url 'problem_detail' problem.slug %}"
-                       class="list-group-item list-group-item-action px-0 py-3 border-0 d-flex justify-content-between align-items-center">
+            {% for group in language.grouped_categories %}
+                <div class="mb-4 ms-3">
+                    <h3 class="h6 text-uppercase tracking-wider text-muted mb-3 border-bottom pb-2">
+                        {{ group.category.name }}
+                    </h3>
 
-                        <span class="fs-5 text-primary">
-                            {{ problem.title }}
-                        </span>
+                    <div class="list-group list-group-flush">
+                        {% for problem in group.problems %}
+                            <a href="{% url 'problem_detail' problem.slug %}"
+                            class="list-group-item list-group-item-action px-0 py-3 border-0 d-flex justify-content-between align-items-center">
 
-                        {% if request.user.is_authenticated %}
-                            <span class="badge {{ problem.review_status_class }}">
-                                {{ problem.review_status_label }}
-                            </span>
-                        {% endif %}
+                                <span class="fs-5 text-primary">
+                                    {{ problem.title }}
+                                </span>
 
-                    </a>
-                {% empty %}
-                    <p class="text-muted small">
-                        No problems available in this language.
-                    </p>
-                {% endfor %}
-            </div>
+                                {% if request.user.is_authenticated %}
+                                    <span class="badge {{ problem.review_status_class }}">
+                                        {{ problem.review_status_label }}
+                                    </span>
+                                {% endif %}
+
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
         </div>
+    {% empty %}
+        <p class="text-muted small">No languages available yet.</p>
     {% endfor %}
 </div>
 {% endblock %}
