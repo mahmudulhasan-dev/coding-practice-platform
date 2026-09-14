@@ -84,7 +84,7 @@ class Problem(BaseModel):
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['category', 'order']
+        ordering = ['language', 'category', 'order']
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -92,7 +92,7 @@ class Problem(BaseModel):
 
         if not self.pk:
             last_order = Problem.objects.filter(
-                category=self.category
+                language=self.language, category=self.category
             ).aggregate(models.Max('order'))['order__max']
             self.order = 0 if last_order is None else last_order + 1
 
