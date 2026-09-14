@@ -90,10 +90,20 @@ class Problem(BaseModel):
         if not self.slug:
             self.slug = slugify(self.title)
 
-        if not self.pk:
+        needs_order = not self.pk
+
+        if self.pk:
+            old_language_id, old_category_id = Problem.objects.filter(
+                pk=self.pk
+            ).values_list('language_id', 'category_id').first()
+
+            if old_language_id != self.language_id or old_category_id != self.category_id:
+                needs_order = True
+
+        if needs_order:
             last_order = Problem.objects.filter(
                 language=self.language, category=self.category
-            ).aggregate(models.Max('order'))['order__max']
+            ).exclude(pk=self.pk).aggregate(models.Max('order'))['order__max']
             self.order = 0 if last_order is None else last_order + 1
 
         super().save(*args, **kwargs)
