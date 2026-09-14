@@ -88,6 +88,15 @@ if DB_ENGINE == "mysql":
             "HOST": os.environ.get("DB_HOST", "localhost"),
             "PORT": os.environ.get("DB_PORT", "3306"),
             "CONN_MAX_AGE": 0,
+        },
+        "sql_sandbox": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.environ["SANDBOX_DB_NAME"],
+            "USER": os.environ["SANDBOX_DB_USER"],
+            "PASSWORD": os.environ["SANDBOX_DB_PASSWORD"],
+            "HOST": os.environ.get("DB_HOST", "localhost"),
+            "PORT": os.environ.get("DB_PORT", "3306"),
+            "CONN_MAX_AGE": 0,
         }
     }
 else:
