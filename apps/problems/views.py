@@ -4,6 +4,9 @@ from django.utils import timezone
 from .models import Problem, Category, ProblemAttempt, Language
 from .utils.code_normalizer import normalize_code
 from .utils.diff_builder import build_line_diff
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .utils.sql_sandbox import run_sandboxed_query, UnsafeQueryError
 
 
 def _attach_review_status(languages, user):
@@ -100,4 +103,31 @@ def problem_detail(request, slug):
         'is_correct': is_correct,
         'diff_rows': diff_rows,
         'next_problem': next_problem,
+    })
+
+
+@require_POST
+def run_sql_submission(request, problem_id):
+    problem = get_object_or_404(SqlProblem, pk=problem_id)
+    user_sql = request.POST.get("query", "")
+
+    try:
+        columns, rows = run_sandboxed_query(user_sql)
+    except UnsafeQueryError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    except Exception as e:
+        # MariaDB raises on timeout / syntax errors — surface a clean message
+        return JsonResponse({"error": "Query failed: " + str(e)}, status=400)
+
+    expected_columns, expected_rows = run_sandboxed_query(problem.reference_query)
+
+    is_correct = (
+        columns == expected_columns
+        and (rows == expected_rows if problem.order_matters else set(rows) == set(expected_rows))
+    )
+
+    return JsonResponse({
+        "columns": columns,
+        "rows": rows,
+        "is_correct": is_correct,
     })
