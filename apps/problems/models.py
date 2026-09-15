@@ -83,6 +83,16 @@ class Problem(BaseModel):
     solution = models.TextField()
     order = models.PositiveIntegerField(default=0)
 
+    PROBLEM_TYPE_CHOICES = [
+        ('code', 'Code Recall'),
+        ('sql', 'SQL Query'),
+    ]
+    problem_type = models.CharField(max_length=10, choices=PROBLEM_TYPE_CHOICES, default='code')
+    order_matters = models.BooleanField(
+        default=False,
+        help_text="If True, row order in SQL results must match reference_query exactly"
+    )
+
     class Meta:
         ordering = ['language', 'category', 'order']
 
