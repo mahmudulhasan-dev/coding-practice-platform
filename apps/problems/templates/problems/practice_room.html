@@ -38,7 +38,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if diff_rows %}
+            {% if diff_rows and problem.problem_type != 'sql' %}
             <div class="diff-container mt-4">
                 <h3>Comparison View:</h3>
                 <div class="diff-legend">
