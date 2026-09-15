@@ -108,7 +108,7 @@ def problem_detail(request, slug):
 
 @require_POST
 def run_sql_submission(request, problem_id):
-    problem = get_object_or_404(SqlProblem, pk=problem_id)
+    problem = get_object_or_404(Problem, pk=problem_id)
     user_sql = request.POST.get("query", "")
 
     try:
@@ -119,7 +119,7 @@ def run_sql_submission(request, problem_id):
         # MariaDB raises on timeout / syntax errors — surface a clean message
         return JsonResponse({"error": "Query failed: " + str(e)}, status=400)
 
-    expected_columns, expected_rows = run_sandboxed_query(problem.reference_query)
+    expected_columns, expected_rows = run_sandboxed_query(problem.solution)
 
     is_correct = (
         columns == expected_columns
