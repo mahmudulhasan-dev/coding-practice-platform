@@ -53,8 +53,8 @@ class LanguageAdmin(admin.ModelAdmin):
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
     form = ProblemAdminForm
-    list_display = ('title', 'language', 'category', 'created_at')
-    list_filter = ('language', 'category')
+    list_display = ('title', 'language', 'category', 'problem_type', 'created_at')
+    list_filter = ('language', 'category', 'problem_type')
     search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}
 
