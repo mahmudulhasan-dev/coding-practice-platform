@@ -74,12 +74,31 @@ def problem_detail(request, slug):
     feedback = ""
     is_correct = False
     diff_rows = None
+    sql_columns = None
+    sql_rows = None
     next_problem = None
 
     if request.method == "POST":
         user_input = request.POST.get('user_answer', '')
-        is_correct = normalize_code(user_input) == normalize_code(problem.solution)
-        feedback = "Correct!" if is_correct else "Incorrect solution."
+
+        if problem.problem_type == "sql":
+            try:
+                user_columns, user_rows = run_sandboxed_query(user_input)
+                expected_columns, expected_rows = run_sandboxed_query(problem.solution)
+                is_correct = (
+                    user_columns == expected_columns
+                    and (user_rows == expected_rows if problem.order_matters
+                         else set(user_rows) == set(expected_rows))
+                )
+                sql_columns, sql_rows = user_columns, user_rows
+                feedback = "Correct!" if is_correct else "Incorrect result set."
+            except UnsafeQueryError as e:
+                is_correct = False
+                feedback = str(e)
+        else:
+            is_correct = normalize_code(user_input) == normalize_code(problem.solution)
+            feedback = "Correct!" if is_correct else "Incorrect solution."
+            diff_rows = build_line_diff(problem.solution, user_input)
 
         if request.user.is_authenticated:
             attempt, _ = ProblemAttempt.objects.get_or_create(
@@ -88,7 +107,6 @@ def problem_detail(request, slug):
             )
             attempt.record_attempt(is_correct)
 
-        diff_rows = build_line_diff(problem.solution, user_input)
         next_problem = (
             Problem.objects
             .filter(category=problem.category, order__gt=problem.order)
@@ -102,6 +120,8 @@ def problem_detail(request, slug):
         'feedback': feedback,
         'is_correct': is_correct,
         'diff_rows': diff_rows,
+        'sql_columns': sql_columns,
+        'sql_rows': sql_rows,
         'next_problem': next_problem,
     })
 
