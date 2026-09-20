@@ -6,7 +6,7 @@ from .utils.code_normalizer import normalize_code
 from .utils.diff_builder import build_line_diff
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from .utils.sql_sandbox import run_sandboxed_query, UnsafeQueryError
+from .utils.sql_sandbox import UnsafeQueryError, compare_query_results
 
 
 def _attach_review_status(languages, user):
@@ -83,14 +83,9 @@ def problem_detail(request, slug):
 
         if problem.problem_type == "sql":
             try:
-                user_columns, user_rows = run_sandboxed_query(user_input)
-                expected_columns, expected_rows = run_sandboxed_query(problem.solution)
-                is_correct = (
-                    user_columns == expected_columns
-                    and (user_rows == expected_rows if problem.order_matters
-                         else set(user_rows) == set(expected_rows))
-                )
-                sql_columns, sql_rows = user_columns, user_rows
+                result = compare_query_results(user_input, problem)
+                is_correct = result["is_correct"]
+                sql_columns, sql_rows = result["columns"], result["rows"]
                 feedback = "Correct!" if is_correct else "Incorrect result set."
             except UnsafeQueryError as e:
                 is_correct = False
@@ -132,22 +127,11 @@ def run_sql_submission(request, problem_id):
     user_sql = request.POST.get("query", "")
 
     try:
-        columns, rows = run_sandboxed_query(user_sql)
+        result = compare_query_results(user_sql, problem)
     except UnsafeQueryError as e:
         return JsonResponse({"error": str(e)}, status=400)
     except Exception as e:
         # MariaDB raises on timeout / syntax errors — surface a clean message
         return JsonResponse({"error": "Query failed: " + str(e)}, status=400)
 
-    expected_columns, expected_rows = run_sandboxed_query(problem.solution)
-
-    is_correct = (
-        columns == expected_columns
-        and (rows == expected_rows if problem.order_matters else set(rows) == set(expected_rows))
-    )
-
-    return JsonResponse({
-        "columns": columns,
-        "rows": rows,
-        "is_correct": is_correct,
-    })
+    return JsonResponse(result)

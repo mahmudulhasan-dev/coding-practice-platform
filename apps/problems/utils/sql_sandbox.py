@@ -60,3 +60,19 @@ def run_sandboxed_query(sql: str):
         columns = [col[0] for col in cursor.description]
         rows = cursor.fetchall()
     return columns, rows
+
+
+def compare_query_results(user_sql: str, problem) -> dict:
+    """Runs user_sql and problem.solution, returns comparison result."""
+    user_columns, user_rows = run_sandboxed_query(user_sql)
+    expected_columns, expected_rows = run_sandboxed_query(problem.solution)
+    is_correct = (
+        user_columns == expected_columns
+        and (user_rows == expected_rows if problem.order_matters
+             else set(user_rows) == set(expected_rows))
+    )
+    return {
+        "columns": user_columns,
+        "rows": user_rows,
+        "is_correct": is_correct,
+    }
