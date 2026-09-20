@@ -2,6 +2,7 @@ import sqlparse
 from django.db import connections
 from sqlparse.tokens import DDL, DML
 from sqlparse.sql import Parenthesis
+from collections import Counter
 
 TIMEOUT_MS = 2000
 FORBIDDEN_DML = {"INSERT", "UPDATE", "DELETE", "REPLACE"}
@@ -69,7 +70,7 @@ def compare_query_results(user_sql: str, problem) -> dict:
     is_correct = (
         user_columns == expected_columns
         and (user_rows == expected_rows if problem.order_matters
-             else set(user_rows) == set(expected_rows))
+             else Counter(user_rows) == Counter(expected_rows))
     )
     return {
         "columns": user_columns,
