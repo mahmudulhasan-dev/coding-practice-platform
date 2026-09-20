@@ -1,6 +1,7 @@
 import sqlparse
 from django.db import connections
 from sqlparse.tokens import DDL, DML
+from sqlparse.sql import Parenthesis
 
 TIMEOUT_MS = 2000
 FORBIDDEN_DML = {"INSERT", "UPDATE", "DELETE", "REPLACE"}
@@ -9,16 +10,31 @@ FORBIDDEN_DDL = {"DROP", "ALTER", "CREATE", "TRUNCATE", "GRANT", "RENAME"}
 class UnsafeQueryError(ValueError):
     pass
 
+
+def _first_real_token(stmt):
+    """Unwrap leading Parenthesis groups (e.g. '(SELECT ...) UNION (SELECT ...)')
+    to find the statement's actual leading keyword."""
+    tok = stmt.token_first(skip_cm=True)
+    while isinstance(tok, Parenthesis):
+        open_paren = tok.token_first(skip_cm=True)
+        idx = tok.token_index(open_paren)
+        tok = tok.token_next(idx, skip_cm=True)[1]
+    return tok
+
+
 def validate_select_only(sql: str) -> str:
-    """Raises UnsafeQueryError unless sql is exactly one SELECT statement."""
+    """Raises UnsafeQueryError unless sql is a single SQL statement that only reads 
+    data (SELECT, optionally combining multiple SELECTs via UNION/INTERSECT/EXCEPT — 
+    parenthesized branches included)."""
+
     statements = [s for s in sqlparse.parse(sql) if s.token_first(skip_cm=True)]
     if len(statements) != 1:
         raise UnsafeQueryError("Submit exactly one SQL statement.")
 
     stmt = statements[0]
-    first_token = stmt.token_first(skip_cm=True)
+    first_token = _first_real_token(stmt)
 
-    if first_token.ttype is not DML or first_token.value.upper() != "SELECT":
+    if first_token is None or first_token.ttype is not DML or first_token.value.upper() != "SELECT":
         raise UnsafeQueryError("Only SELECT statements are allowed.")
 
     for token in stmt.flatten():
