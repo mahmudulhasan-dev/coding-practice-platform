@@ -58,6 +58,7 @@ class ProblemAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_filter = ('language', 'category', 'problem_type')
     search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}
+    ordering = ('order',)
 
     class Media:
         css = {
