@@ -1,3 +1,4 @@
+from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
 from django import forms
 from django_ace import AceWidget
@@ -51,9 +52,9 @@ class LanguageAdmin(admin.ModelAdmin):
 
 
 @admin.register(Problem)
-class ProblemAdmin(admin.ModelAdmin):
+class ProblemAdmin(SortableAdminMixin, admin.ModelAdmin):
     form = ProblemAdminForm
-    list_display = ('title', 'language', 'category', 'problem_type', 'created_at')
+    list_display = ('title', 'language', 'category', 'problem_type', 'order', 'created_at')
     list_filter = ('language', 'category', 'problem_type')
     search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}

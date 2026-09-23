@@ -30,11 +30,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # thir party
+    # third party apps
+    'adminsortable2',
     'rest_framework',
     'django_ace',
     "django_prose_editor",
-    # custom
+    # custom apps
     'apps.core',
     'apps.lessons',
     'apps.problems',
