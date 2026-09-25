@@ -141,7 +141,7 @@ class ProblemAttempt(BaseModel):
     class Meta:
         unique_together = ('user', 'problem')
 
-    def record_attempt(self, is_correct: bool) -> None:
+    def record_attempt(self, is_correct: bool, submitted_code: str = "") -> None:
         """Update streak, solve_count, and schedule the next review date.
 
         Call this once per submission, after your existing correctness
@@ -159,5 +159,33 @@ class ProblemAttempt(BaseModel):
         self.next_review_date = timezone.now().date() + timedelta(days=interval_days)
         self.save()
 
+        AttemptLog.objects.create(
+            review_state=self,
+            problem=self.problem,
+            user=self.user,
+            is_correct=is_correct,
+            submitted_code=submitted_code,
+            streak_after=self.correct_streak,
+            solve_count_after=self.solve_count,
+        )
+
     def __str__(self):
         return f"{self.user.username} - {self.problem.title} - {self.solve_count}"
+
+
+class AttemptLog(BaseModel):
+    """Append-only history — one row per submission, never updated afterward."""
+    review_state = models.ForeignKey(ProblemAttempt, on_delete=models.CASCADE, related_name='logs')
+    problem = models.ForeignKey('Problem', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    is_correct = models.BooleanField()
+    submitted_code = models.TextField(blank=True)
+    streak_after = models.PositiveIntegerField()
+    solve_count_after = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [models.Index(fields=['problem', 'user', '-created_at'])]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.problem.title} @ {self.created_at:%Y-%m-%d %H:%M}"
