@@ -100,7 +100,7 @@ def problem_detail(request, slug):
                 user=request.user,
                 problem=problem
             )
-            attempt.record_attempt(is_correct)
+            attempt.record_attempt(is_correct, submitted_code=user_input)
 
         next_problem = (
             Problem.objects
