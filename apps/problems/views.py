@@ -104,7 +104,7 @@ def problem_detail(request, slug):
 
         next_problem = (
             Problem.objects
-            .filter(category=problem.category, order__gt=problem.order)
+            .filter(language=problem.language, order__gt=problem.order)
             .order_by('order')
             .first()
             )
