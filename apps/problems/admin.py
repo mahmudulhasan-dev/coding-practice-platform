@@ -2,7 +2,8 @@ from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
 from django import forms
 from django_ace import AceWidget
-from .models import Problem, Category, ProblemAttempt, Language
+from .models import Problem, Category, ProblemAttempt, Language, AttemptLog
+from django.utils.html import format_html
 
 
 class LanguageModeSelect(forms.Select):
@@ -77,3 +78,34 @@ class ProblemAttemptAdmin(admin.ModelAdmin):
     autocomplete_fields = ('user', 'problem')
     date_hierarchy = 'next_review_date'
     readonly_fields = ('solve_count', 'correct_streak', 'next_review_date', 'last_solved')
+
+
+@admin.register(AttemptLog)
+class AttemptLogAdmin(admin.ModelAdmin):
+    list_display = (
+        'user', 'problem', 'is_correct', 'streak_after', 'solve_count_after', 'created_at',
+    )
+    list_filter = ('is_correct', 'problem__language', 'created_at')
+    search_fields = ('user__email', 'problem__title')
+    date_hierarchy = 'created_at'
+    list_select_related = ('user', 'problem')
+    ordering = ('-created_at',)
+
+    fields = (
+        'user', 'problem', 'review_state', 'is_correct',
+        'streak_after', 'solve_count_after', 'code_preview', 'created_at',
+    )
+    readonly_fields = fields
+
+    @admin.display(description='Submitted code')
+    def code_preview(self, obj):
+        return format_html(
+            '<pre style="white-space: pre-wrap; margin: 0;">{}</pre>',
+            obj.submitted_code,
+        )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
