@@ -6,6 +6,7 @@ from django_prose_editor.fields import ProseEditorField
 from datetime import timedelta
 from django.utils import timezone
 from .utils.spaced_repetition import get_next_interval_days
+from .utils.mistake_guess import guess_reason
 
 
 class Category(BaseModel):
@@ -169,33 +170,44 @@ class ProblemAttempt(BaseModel):
     class Meta:
         unique_together = ('user', 'problem')
 
-    def record_attempt(self, is_correct: bool, submitted_code: str = "") -> None:
-        """Update streak, solve_count, and schedule the next review date.
+    def record_attempt(self, is_correct: bool, submitted_code: str = "") -> "AttemptLog":
+        with transaction.atomic():
+            if is_correct:
+                self.solve_count += 1
+                self.correct_streak += 1
+            else:
+                self.correct_streak = 0
 
-        Call this once per submission, after your existing correctness
-        check determines is_correct — this method owns nothing about
-        *how* correctness is judged, only what happens to the review
-        schedule afterward.
-        """
-        if is_correct:
-            self.solve_count += 1
-            self.correct_streak += 1
-        else:
-            self.correct_streak = 0
+            interval_days = get_next_interval_days(self.correct_streak)
+            self.next_review_date = timezone.now().date() + timedelta(days=interval_days)
+            self.save()
 
-        interval_days = get_next_interval_days(self.correct_streak)
-        self.next_review_date = timezone.now().date() + timedelta(days=interval_days)
-        self.save()
+            run = PracticeRun.get_or_start(self.user, self.problem)
 
-        AttemptLog.objects.create(
-            review_state=self,
-            problem=self.problem,
-            user=self.user,
-            is_correct=is_correct,
-            submitted_code=submitted_code,
-            streak_after=self.correct_streak,
-            solve_count_after=self.solve_count,
-        )
+            # If the previous wrong attempt never got a reason picked, keep the guess
+            run.logs.filter(is_correct=False, mistake_reason='').update(
+                mistake_reason=models.F('suggested_reason')
+            )
+
+            log = AttemptLog.objects.create(
+                review_state=self,
+                problem=self.problem,
+                user=self.user,
+                is_correct=is_correct,
+                submitted_code=submitted_code,
+                streak_after=self.correct_streak,
+                solve_count_after=self.solve_count,
+                run=run,
+                attempt_number=run.logs.count() + 1,
+                suggested_reason='' if is_correct else guess_reason(
+                    submitted_code, self.problem.solution
+                ),
+            )
+
+            if is_correct:
+                run.solved_at = timezone.now()
+                run.save(update_fields=['solved_at'])
+        return log
 
     def __str__(self):
         return f"{self.user.username} - {self.problem.title} - {self.solve_count}"
