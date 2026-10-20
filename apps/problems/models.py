@@ -128,6 +128,34 @@ class ProblemAttemptManager(models.Manager):
         return self.filter(user=user, next_review_date__lte=today).select_related('problem')
 
 
+class PracticeRun(BaseModel):
+    """
+    A run groups one day's attempts at one problem, from first submit
+    until the first correct one. Runs never span calendar days, so an
+    unsolved problem restarts its attempt count the next morning.
+    """
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    problem = models.ForeignKey('Problem', on_delete=models.CASCADE, related_name='runs')
+    solved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [models.Index(fields=['user', 'problem', '-created_at'])]
+
+    @classmethod
+    def get_or_start(cls, user, problem):
+        today = timezone.localdate()
+        run = (cls.objects.filter(user=user, problem=problem, solved_at__isnull=True)
+               .order_by('-created_at').first())
+        if run and timezone.localdate(run.created_at) != today:
+            run = None
+        return run or cls.objects.create(user=user, problem=problem)
+
+    @property
+    def attempts_count(self):
+        return self.logs.count()
+
+
 class ProblemAttempt(BaseModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     problem = models.ForeignKey('Problem', on_delete=models.CASCADE)
