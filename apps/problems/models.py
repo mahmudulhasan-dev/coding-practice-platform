@@ -202,7 +202,17 @@ class ProblemAttempt(BaseModel):
 
 
 class AttemptLog(BaseModel):
-    """Append-only history — one row per submission, never updated afterward."""
+    """Append-only history — one row per submission.  Only mistake_reason may be
+    edited afterward (the user picks it after the solution is revealed)."""
+
+    class Reason(models.TextChoices):
+        TYPO = 'typo', 'Typo / small slip'
+        SYNTAX = 'syntax', 'Syntax mistake'
+        FORGOT = 'forgot', 'Forgot the approach'
+        LOGIC = 'logic', 'Logic error'
+        PARTIAL = 'partial', 'Remembered only part'
+        OTHER = 'other', 'Other'
+    
     review_state = models.ForeignKey(ProblemAttempt, on_delete=models.CASCADE, related_name='logs')
     problem = models.ForeignKey('Problem', on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -210,6 +220,12 @@ class AttemptLog(BaseModel):
     submitted_code = models.TextField(blank=True)
     streak_after = models.PositiveIntegerField()
     solve_count_after = models.PositiveIntegerField()
+
+    run = models.ForeignKey(PracticeRun, null=True, blank=True,
+                            on_delete=models.CASCADE, related_name='logs')
+    attempt_number = models.PositiveIntegerField(default=1)
+    mistake_reason = models.CharField(max_length=20, choices=Reason.choices, blank=True)
+    suggested_reason = models.CharField(max_length=20, blank=True)
 
     class Meta:
         ordering = ['-created_at']
