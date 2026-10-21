@@ -1,12 +1,24 @@
 from django.db.models import Prefetch
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
-from .models import Problem, Category, ProblemAttempt, Language
+from .models import Problem, Category, ProblemAttempt, Language, AttemptLog
 from .utils.code_normalizer import normalize_code
 from .utils.diff_builder import build_line_diff
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .utils.sql_sandbox import UnsafeQueryError, compare_query_results
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+@require_POST
+def set_reason(request, pk):
+    log = get_object_or_404(AttemptLog, pk=pk, user=request.user)
+    reason = request.POST.get('reason', '')
+    if reason in AttemptLog.Reason.values:
+        log.mistake_reason = reason
+        log.save(update_fields=['mistake_reason'])
+    return JsonResponse({'ok': True})
 
 
 def _attach_review_status(languages, user):
@@ -77,6 +89,7 @@ def problem_detail(request, slug):
     sql_columns = None
     sql_rows = None
     next_problem = None
+    log = None
 
     if request.method == "POST":
         user_input = request.POST.get('user_answer', '')
@@ -100,7 +113,7 @@ def problem_detail(request, slug):
                 user=request.user,
                 problem=problem
             )
-            attempt.record_attempt(is_correct, submitted_code=user_input)
+            log = attempt.record_attempt(is_correct, submitted_code=user_input)
 
         next_problem = (
             Problem.objects
@@ -118,6 +131,8 @@ def problem_detail(request, slug):
         'sql_columns': sql_columns,
         'sql_rows': sql_rows,
         'next_problem': next_problem,
+        'log': log,
+        'reasons': AttemptLog.Reason.choices,
     })
 
 
