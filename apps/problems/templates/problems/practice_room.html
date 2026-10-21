@@ -26,6 +26,16 @@
                     {{ feedback }}
                 </div>
 
+                {% if log %}
+                    <p class="text-muted small mb-2">
+                        {% if is_correct %}
+                            Solved on attempt {{ log.attempt_number }} today.
+                        {% else %}
+                            Attempt {{ log.attempt_number }} today.
+                        {% endif %}
+                    </p>
+                {% endif %}  
+
                 {% if next_problem %}
                     <a href="{% url 'problem_detail' next_problem.slug %}" class="btn btn-primary w-100 mb-3">
                         Next Problem: {{ next_problem.title }} &rarr;
@@ -67,6 +77,31 @@
                     </tbody>
                 </table>
             </div>
+            {% endif %}
+
+            {% if log and not is_correct %}
+            <div class="mt-3" id="reason-box" data-url="{% url 'set_reason' log.pk %}">
+                <div class="small text-muted mb-1">Why was it wrong?</div>
+                {% for value, label in reasons %}
+                    <input type="radio" class="btn-check" name="reason" id="r-{{ value }}" value="{{ value }}"
+                           {% if value == log.suggested_reason %}checked{% endif %}>
+                    <label class="btn btn-outline-secondary btn-sm" for="r-{{ value }}">{{ label }}</label>
+                {% endfor %}
+            </div>
+            <script>
+                document.querySelectorAll('#reason-box input').forEach(function (el) {
+                    el.addEventListener('change', function () {
+                        fetch(document.getElementById('reason-box').dataset.url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'reason=' + el.value
+                        });
+                    });
+                });
+            </script>
             {% endif %}
 
             {% if problem.language.ace_mode == 'mysql' %}
