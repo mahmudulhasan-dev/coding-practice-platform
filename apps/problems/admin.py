@@ -1,8 +1,9 @@
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
+from django.db.models import Count
 from django import forms
 from django_ace import AceWidget
-from .models import Problem, Category, ProblemAttempt, Language, AttemptLog
+from .models import Problem, Category, ProblemAttempt, Language, AttemptLog, PracticeRun
 from django.utils.html import format_html
 
 
@@ -105,6 +106,54 @@ class AttemptLogAdmin(admin.ModelAdmin):
             '<pre style="white-space: pre-wrap; margin: 0;">{}</pre>',
             obj.submitted_code,
         )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+class AttemptLogInline(admin.TabularInline):
+    model = AttemptLog
+    extra = 0
+    can_delete = False
+    show_change_link = True
+    ordering = ('attempt_number',)
+    fields = ('attempt_number', 'is_correct', 'mistake_reason', 'suggested_reason', 'created_at')
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(PracticeRun)
+class PracticeRunAdmin(admin.ModelAdmin):
+    list_display = ('user', 'problem', 'created_at', 'attempts', 'solved', 'solved_at')
+    list_filter = (
+        ('solved_at', admin.EmptyFieldListFilter),   # unsolved / solved runs
+        'problem__language',
+        'created_at',
+    )
+    search_fields = ('user__email', 'problem__title')
+    date_hierarchy = 'created_at'
+    list_select_related = ('user', 'problem')
+    ordering = ('-created_at',)
+    inlines = [AttemptLogInline]
+
+    fields = ('user', 'problem', 'solved_at', 'created_at')
+    readonly_fields = fields
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(_attempts=Count('logs'))
+
+    @admin.display(description='Attempts', ordering='_attempts')
+    def attempts(self, obj):
+        return obj._attempts
+
+    @admin.display(description='Solved', boolean=True, ordering='solved_at')
+    def solved(self, obj):
+        return obj.solved_at is not None
 
     def has_add_permission(self, request):
         return False
