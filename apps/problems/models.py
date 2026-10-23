@@ -3,7 +3,7 @@ from django.utils.text import slugify
 from apps.core.models import BaseModel
 from django.conf import settings
 from django_prose_editor.fields import ProseEditorField
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 from django.utils import timezone
 from .utils.spaced_repetition import get_next_interval_days
 from .utils.mistake_guess import guess_reason
@@ -170,13 +170,22 @@ class ProblemAttempt(BaseModel):
     class Meta:
         unique_together = ('user', 'problem')
 
+    def _is_first_attempt_today(self) -> bool:
+        start = timezone.make_aware(datetime.combine(timezone.localdate(), time.min))
+        return not AttemptLog.objects.filter(
+            user=self.user, problem=self.problem, created_at__gte=start
+        ).exists()
+    
     def record_attempt(self, is_correct: bool, submitted_code: str = "") -> "AttemptLog":
         with transaction.atomic():
-            if is_correct:
-                self.solve_count += 1
-                self.correct_streak += 1
-            else:
-                self.correct_streak = 0
+            is_scored = self._is_first_attempt_today()
+
+            if is_scored:
+                if is_correct:
+                    self.solve_count += 1
+                    self.correct_streak += 1
+                else:
+                    self.correct_streak = 0
 
             interval_days = get_next_interval_days(self.correct_streak)
             self.next_review_date = timezone.now().date() + timedelta(days=interval_days)
@@ -190,6 +199,7 @@ class ProblemAttempt(BaseModel):
             )
 
             log = AttemptLog.objects.create(
+                is_scored=is_scored,
                 review_state=self,
                 problem=self.problem,
                 user=self.user,
