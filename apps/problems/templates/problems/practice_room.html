@@ -83,24 +83,34 @@
             <div class="mt-3" id="reason-box" data-url="{% url 'set_reason' log.pk %}">
                 <div class="small text-muted mb-1">Why was it wrong?</div>
                 {% for value, label in reasons %}
-                    <input type="radio" class="btn-check" name="reason" id="r-{{ value }}" value="{{ value }}"
-                           {% if value == log.suggested_reason %}checked{% endif %}>
-                    <label class="btn btn-outline-secondary btn-sm" for="r-{{ value }}">{{ label }}</label>
+                    <button type="button" 
+                        class="btn btn-sm {% if value == log.suggested_reason }btn-secondary{% else %}btn-outline-secondary{% endif %}"
+                        data-reason="{{ value }}">{{ kabek }}</button>
                 {% endfor %}
             </div>
             <script>
-                document.querySelectorAll('#reason-box input').forEach(function (el) {
-                    el.addEventListener('change', function () {
-                        fetch(document.getElementById('reason-box').dataset.url, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRFToken': '{{ csrf_token }}',
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'reason=' + el.value
+                (function () {
+                    var box = document.getElementById('reason-box');
+                    var buttons = box.querySelectorAll('button[data-reason]');
+                    buttons.forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            buttons.forEach(function (b) {
+                                b.classList.remove('btn-secondary');
+                                b.classList.add('btn-outline-secondary');
+                            });
+                            btn.classList.remove('btn-outline-secondary');
+                            btn.classList.add('btn-secondary');
+                            fetch(box.dataset.url, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRFToken': '{{ csrf_token }}',
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: 'reason=' + btn.dataset.reason
+                            });
                         });
                     });
-                });
+                })();
             </script>
             {% endif %}
 
