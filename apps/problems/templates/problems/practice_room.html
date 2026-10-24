@@ -90,7 +90,7 @@
                 <div class="small text-muted mb-1">Why was it wrong?</div>
                 {% for value, label in reasons %}
                     <button type="button" 
-                        class="btn btn-sm {% if value == log.suggested_reason }btn-secondary{% else %}btn-outline-secondary{% endif %}"
+                        class="btn btn-sm {% if value == log.suggested_reason %}btn-secondary{% else %}btn-outline-secondary{% endif %}"
                         data-reason="{{ value }}">{{ kabek }}</button>
                 {% endfor %}
             </div>
