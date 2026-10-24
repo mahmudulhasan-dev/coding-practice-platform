@@ -33,6 +33,11 @@
                         {% else %}
                             Attempt {{ log.attempt_number }} today.
                         {% endif %}
+                        {% if log.is_scored %}
+                            {% if is_correct %}Counted toward your review schedule.{% else %}Counted as a miss, so this problem comes back for review soon.{% endif %}
+                        {% else %}
+                            Practice attempt: your schedule isn't affected.
+                        {% endif %}
                     </p>
                 {% endif %}  
 
