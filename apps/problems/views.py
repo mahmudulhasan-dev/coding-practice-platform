@@ -90,6 +90,7 @@ def problem_detail(request, slug):
     sql_rows = None
     next_problem = None
     log = None
+    review_mode = False
 
     if request.method == "POST":
         user_input = request.POST.get('user_answer', '')
@@ -107,6 +108,8 @@ def problem_detail(request, slug):
             is_correct = normalize_code(user_input) == normalize_code(problem.solution)
             feedback = "Correct!" if is_correct else "Incorrect solution."
             diff_rows = build_line_diff(problem.solution, user_input)
+
+        review_mode = not is_correct and problem.problem_type != 'sql'
 
         if request.user.is_authenticated:
             attempt, _ = ProblemAttempt.objects.get_or_create(
@@ -133,6 +136,7 @@ def problem_detail(request, slug):
         'next_problem': next_problem,
         'log': log,
         'reasons': AttemptLog.Reason.choices,
+        'review_mode': review_mode,
     })
 
 
