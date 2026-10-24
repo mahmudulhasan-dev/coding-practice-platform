@@ -84,10 +84,10 @@ class ProblemAttemptAdmin(admin.ModelAdmin):
 @admin.register(AttemptLog)
 class AttemptLogAdmin(admin.ModelAdmin):
     list_display = (
-        'user', 'problem', 'attempt_number', 'is_correct', 
+        'user', 'problem', 'attempt_number', 'is_scored', 'is_correct', 
         'mistake_reason', 'streak_after', 'solve_count_after', 'created_at',
     )
-    list_filter = ('is_correct', 'problem__language', 'created_at')
+    list_filter = ('is_correct', 'is_scored', 'problem__language', 'created_at')
     search_fields = ('user__email', 'problem__title')
     date_hierarchy = 'created_at'
     list_select_related = ('user', 'problem', 'run')
@@ -95,7 +95,7 @@ class AttemptLogAdmin(admin.ModelAdmin):
 
     fields = (
         'user', 'problem', 'review_state', 'run', 'attempt_number', 'is_correct',
-        'mistake_reason', 'suggested_reason', 
+        'is_scored', 'mistake_reason', 'suggested_reason', 
         'streak_after', 'solve_count_after', 'code_preview', 'created_at',
     )
     readonly_fields = fields
@@ -120,7 +120,7 @@ class AttemptLogInline(admin.TabularInline):
     can_delete = False
     show_change_link = True
     ordering = ('attempt_number',)
-    fields = ('attempt_number', 'is_correct', 'mistake_reason', 'suggested_reason', 'created_at')
+    fields = ('attempt_number', 'is_correct', 'is_scored', 'mistake_reason', 'suggested_reason', 'created_at')
     readonly_fields = fields
 
     def has_add_permission(self, request, obj=None):

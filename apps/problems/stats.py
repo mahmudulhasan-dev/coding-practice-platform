@@ -3,9 +3,9 @@ from .models import AttemptLog, PracticeRun
 
 
 def first_try_rate(user):
-    runs = PracticeRun.objects.filter(user=user, solved_at__isnull=False).annotate(n=Count('logs'))
-    total = runs.count()
-    return runs.filter(n=1).count() / total if total else 0.0
+    scored = AttemptLog.objects.filter(user=user, is_scored=True)
+    total = scored.count()
+    return scored.filter(is_correct=True).count() / total if total else 0.0
 
 
 def mistake_breakdown(user):
