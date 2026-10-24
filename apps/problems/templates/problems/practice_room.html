@@ -91,7 +91,7 @@
                 {% for value, label in reasons %}
                     <button type="button" 
                         class="btn btn-sm {% if value == log.suggested_reason %}btn-secondary{% else %}btn-outline-secondary{% endif %}"
-                        data-reason="{{ value }}">{{ kabek }}</button>
+                        data-reason="{{ value }}">{{ label }}</button>
                 {% endfor %}
             </div>
             <script>
