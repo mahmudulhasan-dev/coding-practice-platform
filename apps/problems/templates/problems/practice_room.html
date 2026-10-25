@@ -38,8 +38,11 @@
                         {% else %}
                             Practice attempt: your schedule isn't affected.
                         {% endif %}
+                        {% if log.duration_seconds is not None %}
+                            Time taken: {{ log.duration_seconds }}s
+                        {% endif %}
                     </p>
-                {% endif %}  
+                {% endif %}
 
                 {% if next_problem %}
                     <a href="{% url 'problem_detail' next_problem.slug %}" class="btn btn-primary w-100 mb-3">
@@ -141,6 +144,7 @@
                 {% csrf_token %}
                 <h4>Your Logic:</h4>
                 <textarea name="user_answer" id="user_answer_hidden" style="display:none;"></textarea>
+                <input type="hidden" name="elapsed_seconds" id="elapsed_seconds" value="0">
                 <div id="editor" style="height: 400px; width: 100%; border-radius: 5px; border: 1px solid #444;">{{ user_input }}</div>
                 <button type="submit" class="btn btn-success w-100 mt-3" onclick="syncCode()">Submit and Reveal Answer</button>
             </form>
@@ -169,9 +173,30 @@
         enableBasicAutocompletion: true,
     });
 
+    // Active-time timer: counts only while the tab is visible
+    var activeMs = 0;
+    var lastTick = document.hidden ? null : performance.now();
+
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            if (lastTick !== null) {
+                activeMs += performance.now() - lastTick;
+                lastTick = null;
+            }
+        } else {
+            lastTick = performance.now();
+        }
+    });
+
+    function elapsedSeconds() {
+        var total = activeMs + (lastTick !== null ? performance.now() - lastTick : 0);
+        return Math.round(total / 1000);
+    }
+
     function syncCode() {
         var code = editor.getValue();
         document.getElementById('user_answer_hidden').value = code;
+        document.getElementById('elapsed_seconds').value = elapsedSeconds();
     }
 
     function startFixing() {
