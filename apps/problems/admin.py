@@ -1,6 +1,6 @@
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django import forms
 from django_ace import AceWidget
 from .models import Problem, Category, ProblemAttempt, Language, AttemptLog, PracticeRun
@@ -84,7 +84,7 @@ class ProblemAttemptAdmin(admin.ModelAdmin):
 @admin.register(AttemptLog)
 class AttemptLogAdmin(admin.ModelAdmin):
     list_display = (
-        'user', 'problem', 'attempt_number', 'is_scored', 'is_correct', 
+        'user', 'problem', 'attempt_number', 'is_scored', 'is_correct', 'duration_seconds',
         'mistake_reason', 'streak_after', 'solve_count_after', 'created_at',
     )
     list_filter = ('is_correct', 'is_scored', 'problem__language', 'created_at')
@@ -95,7 +95,7 @@ class AttemptLogAdmin(admin.ModelAdmin):
 
     fields = (
         'user', 'problem', 'review_state', 'run', 'attempt_number', 'is_correct',
-        'is_scored', 'mistake_reason', 'suggested_reason', 
+        'is_scored', 'mistake_reason', 'suggested_reason', 'duration_seconds',
         'streak_after', 'solve_count_after', 'code_preview', 'created_at',
     )
     readonly_fields = fields
@@ -120,7 +120,8 @@ class AttemptLogInline(admin.TabularInline):
     can_delete = False
     show_change_link = True
     ordering = ('attempt_number',)
-    fields = ('attempt_number', 'is_correct', 'is_scored', 'mistake_reason', 'suggested_reason', 'created_at')
+    fields = ('attempt_number', 'is_correct', 'is_scored', 'mistake_reason', 
+              'suggested_reason', 'duration_seconds', 'created_at')
     readonly_fields = fields
 
     def has_add_permission(self, request, obj=None):
@@ -129,7 +130,8 @@ class AttemptLogInline(admin.TabularInline):
 
 @admin.register(PracticeRun)
 class PracticeRunAdmin(admin.ModelAdmin):
-    list_display = ('user', 'problem', 'created_at', 'attempts', 'solved', 'solved_at')
+    list_display = ('user', 'problem', 'created_at', 'attempts', 
+                    'time_spent', 'solved', 'solved_at')
     list_filter = (
         ('solved_at', admin.EmptyFieldListFilter),   # unsolved / solved runs
         'problem__language',
@@ -145,7 +147,14 @@ class PracticeRunAdmin(admin.ModelAdmin):
     readonly_fields = fields
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(_attempts=Count('logs'))
+        return super().get_queryset(request).annotate(
+            _attempts=Count('logs'),
+            _seconds=Sum('logs__duration_seconds'),
+            )
+
+    @admin.display(description='Time (s)', ordering='_seconds')
+    def time_spent(self, obj):
+        return obj._seconds
 
     @admin.display(description='Attempts', ordering='_attempts')
     def attempts(self, obj):
