@@ -176,7 +176,8 @@ class ProblemAttempt(BaseModel):
             user=self.user, problem=self.problem, created_at__gte=start
         ).exists()
     
-    def record_attempt(self, is_correct: bool, submitted_code: str = "") -> "AttemptLog":
+    def record_attempt(self, is_correct: bool, submitted_code: str = "",
+                        duration_seconds: int | None = None) -> "AttemptLog":
         with transaction.atomic():
             is_scored = self._is_first_attempt_today()
 
@@ -212,6 +213,7 @@ class ProblemAttempt(BaseModel):
                 suggested_reason='' if is_correct else guess_reason(
                     submitted_code, self.problem.solution
                 ),
+                duration_seconds=duration_seconds,
             )
 
             if is_correct:

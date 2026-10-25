@@ -80,6 +80,17 @@ def problem_list(request):
     })
 
 
+MAX_ATTEMPT_SECONDS = 2 * 60 * 60  # ignore absurd values (e.g. tab left open)
+
+
+def _parse_duration(raw):
+    try:
+        secs = int(float(raw))
+    except (TypeError, ValueError):
+        return None
+    return max(0, min(secs, MAX_ATTEMPT_SECONDS))
+
+
 def problem_detail(request, slug):
     problem = get_object_or_404(Problem, slug=slug)
     user_input = ""
@@ -116,7 +127,11 @@ def problem_detail(request, slug):
                 user=request.user,
                 problem=problem
             )
-            log = attempt.record_attempt(is_correct, submitted_code=user_input)
+            log = attempt.record_attempt(
+                is_correct, 
+                submitted_code=user_input,
+                duration_seconds=_parse_duration(request.POST.get('elapsed_seconds')),
+                )
 
         next_problem = (
             Problem.objects
