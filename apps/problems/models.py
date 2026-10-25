@@ -242,13 +242,13 @@ class AttemptLog(BaseModel):
     submitted_code = models.TextField(blank=True)
     streak_after = models.PositiveIntegerField()
     solve_count_after = models.PositiveIntegerField()
-
     run = models.ForeignKey(PracticeRun, null=True, blank=True,
                             on_delete=models.CASCADE, related_name='logs')
     attempt_number = models.PositiveIntegerField(default=1)
     mistake_reason = models.CharField(max_length=20, choices=Reason.choices, blank=True)
     suggested_reason = models.CharField(max_length=20, blank=True)
     is_scored = models.BooleanField(default=True)
+    duration_seconds = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ['-created_at']
