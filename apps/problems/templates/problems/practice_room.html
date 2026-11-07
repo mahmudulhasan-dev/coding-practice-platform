@@ -142,7 +142,10 @@
             <div id="editor-panel" {% if review_mode %}class="d-none"{% endif %}> 
             <form method="POST" id="practice-form">
                 {% csrf_token %}
-                <h4>Your Logic:</h4>
+                <h4>
+                    Your Logic:
+                    <span id="attempt-timer" class="badge bg-secondary ms-2 fs-6">00:00</span>
+                </h4>
                 <textarea name="user_answer" id="user_answer_hidden" style="display:none;"></textarea>
                 <input type="hidden" name="elapsed_seconds" id="elapsed_seconds" value="0">
                 <div id="editor" style="height: 400px; width: 100%; border-radius: 5px; border: 1px solid #444;">{{ user_input }}</div>
@@ -193,6 +196,22 @@
         return Math.round(total / 1000);
     }
 
+    function formatTime(totalSeconds) {
+        var h = Math.floor(totalSeconds / 3600);
+        var m = Math.floor((totalSeconds % 3600) / 60);
+        var s = totalSeconds % 60;
+        var mm = String(m).padStart(2, '0');
+        var ss = String(s).padStart(2, '0');
+        return h > 0 ? h + ':' + mm + ':' + ss : mm + ':' + ss;
+    }
+
+    var timerEl = document.getElementById('attempt-timer');
+    function renderTimer() {
+        if (timerEl) timerEl.textContent = formatTime(elapsedSeconds());
+    }
+    setInterval(renderTimer, 500);
+    renderTimer();
+
     function syncCode() {
         var code = editor.getValue();
         document.getElementById('user_answer_hidden').value = code;
@@ -209,6 +228,7 @@
         if (typeof activeMs !== 'undefined') {
             activeMs = 0;
             lastTick = document.hidden ? null : performance.now();
+            renderTimer();
         }
     }
 </script>
