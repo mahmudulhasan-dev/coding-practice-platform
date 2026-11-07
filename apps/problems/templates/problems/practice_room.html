@@ -125,8 +125,13 @@
 
             {% if review_mode %}
                 <button type="button" class="btn btn-warning w-100 mt-3"
-                    onclick="startFixing()">
+                    onclick="showEditor()">
                     Fix it
+                </button>
+            {% elif is_correct %}
+                <button type="button" class="btn btn-primary w-100 mt-3"
+                    onClick="showEditor(true)">
+                    Practice again
                 </button>
             {% endif %}
             </div>
@@ -139,18 +144,18 @@
             </div>
             {% endif %}
 
-            <div id="editor-panel" {% if review_mode %}class="d-none"{% endif %}> 
-            <form method="POST" id="practice-form">
-                {% csrf_token %}
-                <h4>
-                    Your Logic:
-                    <span id="attempt-timer" class="badge bg-secondary ms-2 fs-6">00:00</span>
-                </h4>
-                <textarea name="user_answer" id="user_answer_hidden" style="display:none;"></textarea>
-                <input type="hidden" name="elapsed_seconds" id="elapsed_seconds" value="0">
-                <div id="editor" style="height: 400px; width: 100%; border-radius: 5px; border: 1px solid #444;">{{ user_input }}</div>
-                <button type="submit" class="btn btn-success w-100 mt-3" onclick="syncCode()">Submit and Reveal Answer</button>
-            </form>
+            <div id="editor-panel" {% if editor_hidden %}class="d-none"{% endif %}> 
+                <form method="POST" id="practice-form">
+                    {% csrf_token %}
+                    <h4>
+                        Your Logic:
+                        <span id="attempt-timer" class="badge bg-secondary ms-2 fs-6">00:00</span>
+                    </h4>
+                    <textarea name="user_answer" id="user_answer_hidden" style="display:none;"></textarea>
+                    <input type="hidden" name="elapsed_seconds" id="elapsed_seconds" value="0">
+                    <div id="editor" style="height: 400px; width: 100%; border-radius: 5px; border: 1px solid #444;">{{ user_input }}</div>
+                    <button type="submit" class="btn btn-success w-100 mt-3" onclick="syncCode()">Submit and Reveal Answer</button>
+                </form>
             </div>
         </div>
     </div>
@@ -218,10 +223,11 @@
         document.getElementById('elapsed_seconds').value = elapsedSeconds();
     }
 
-    function startFixing() {
+    function showEditor(clear) {
         document.getElementById('review-panel').classList.add('d-none');
         var panel = document.getElementById('editor-panel');
         panel.classList.remove('d-none');
+        if (clear) editor.setValue('', -1);
         editor.resize();
         editor.focus();
         panel.scrollIntoView({behavior: 'smooth'});

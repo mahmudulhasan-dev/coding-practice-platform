@@ -102,6 +102,7 @@ def problem_detail(request, slug):
     next_problem = None
     log = None
     review_mode = False
+    editor_hidden = False
 
     if request.method == "POST":
         user_input = request.POST.get('user_answer', '')
@@ -121,6 +122,7 @@ def problem_detail(request, slug):
             diff_rows = build_line_diff(problem.solution, user_input)
 
         review_mode = not is_correct and problem.problem_type != 'sql'
+        editor_hidden = review_mode or is_correct
 
         if request.user.is_authenticated:
             attempt, _ = ProblemAttempt.objects.get_or_create(
@@ -152,6 +154,7 @@ def problem_detail(request, slug):
         'log': log,
         'reasons': AttemptLog.Reason.choices,
         'review_mode': review_mode,
+        'editor_hidden': editor_hidden,
     })
 
 
