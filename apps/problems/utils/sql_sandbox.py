@@ -67,13 +67,19 @@ def compare_query_results(user_sql: str, problem) -> dict:
     """Runs user_sql and problem.solution, returns comparison result."""
     user_columns, user_rows = run_sandboxed_query(user_sql)
     expected_columns, expected_rows = run_sandboxed_query(problem.solution)
-    is_correct = (
-        user_columns == expected_columns
-        and (user_rows == expected_rows if problem.order_matters
-             else Counter(user_rows) == Counter(expected_rows))
+
+    columns_match = (
+        [c.lower() for c in user_columns] == [c.lower() for c in expected_columns]
     )
+
+    rows_match = (
+        user_rows == expected_rows 
+        if problem.order_matters
+        else Counter(user_rows) == Counter(expected_rows)
+    )
+
     return {
         "columns": user_columns,
         "rows": user_rows,
-        "is_correct": is_correct,
+        "is_correct": columns_match and rows_match,
     }
